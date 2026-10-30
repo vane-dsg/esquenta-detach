@@ -46,7 +46,7 @@ button{cursor:pointer}
 .pad{padding-inline:20px}
 
 /* ---------- fundo: gradiente animado ---------- */
-.bg{position:absolute;inset:0;overflow:hidden;background:var(--night);z-index:0;pointer-events:none}
+.bg{position:absolute;inset:0;overflow:hidden;background:var(--night);z-index:0;pointer-events:none;isolation:isolate;transform:translateZ(0)}
 .bg i{position:absolute;width:150%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;will-change:rotate,translate}
 .bg i:nth-child(1){left:-75%;top:-55%;background:radial-gradient(circle,rgba(255,75,39,.85) 0,rgba(255,75,39,0) 55%);transform-origin:60% 65%;animation:orbit 34s linear infinite,swayA 13s ease-in-out infinite alternate}
 .bg i:nth-child(2){right:-80%;top:-20%;background:radial-gradient(circle,rgba(135,64,233,.9) 0,rgba(135,64,233,0) 55%);transform-origin:40% 60%;animation:orbit 41s linear infinite reverse,swayB 15s ease-in-out infinite alternate}
@@ -159,7 +159,7 @@ button{cursor:pointer}
 #main .main-bg{z-index:0}
 #main .main-bg .veil{background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 100%)}
 #view-trilha{z-index:1}
-.trail-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.trail-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;isolation:isolate}
 .trail-bg .blob{position:absolute;border-radius:50%;filter:blur(70px)}
 .trail-bg .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 40%,rgba(11,6,19,.85) 100%)}
 .trail-bg .tex{position:absolute;left:-74px;top:-21px;bottom:0;width:512px;opacity:.28;mix-blend-mode:color-dodge;background:url("assets/textura-figma-3x.jpg") 0 0/512px 376px repeat-y}
@@ -338,6 +338,7 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .fx-tile>span:last-child:not(.fx-well){max-width:100%;overflow-wrap:anywhere}
 .fx-well{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:18px;background:#EEE8FB;transition:box-shadow .15s,opacity .15s}
 .fx-well canvas{width:88%;height:88%}
+.fx-well canvas.bleed{width:100%;height:100%;border-radius:inherit}
 .fx-none{color:#8E829F}
 .fx-none svg{width:28px;height:28px}
 .fx-tile[aria-checked="true"]{color:var(--fg)}
@@ -861,6 +862,12 @@ const SLOTS = [
   {id:'s4', time:'10h45', short:'Workshop', title:'Do prompt ao portfólio: layout e conteúdo com IA, publicado no GitHub Pages', who:'Workshop · Vanessa Sousa'},
   {id:'s5', time:'11h45', short:'Encerramento', title:'Até a próxima!', who:''},
 ];
+// horário real do evento (Fortaleza, UTC-3). Antes das 08h30 o Coffee já fica liberado; cada momento abre no seu horário.
+const EVENT_DATE = '2026-10-31';
+const slotStart = i => { const [h, m] = SLOTS[i].time.split('h'); return new Date(`${EVENT_DATE}T${h.padStart(2,'0')}:${m}:00-03:00`).getTime(); };
+const liveSlot = (t = Date.now()) => { let k = 0; SLOTS.forEach((_, i) => { if(t >= slotStart(i)) k = i; }); return k; };
+// modo de teste só com ?teste no endereço (link secreto): mostra os controles do protótipo
+const TEST_URL = new URLSearchParams(location.search).has('teste');
 const STAGE_ICON = ['coffee','flag','mic','ticket','laptop','laptop'];
 const TRACK_N = 5; // a barra do topo tem 5 marcos (o encerramento não tem nó próprio no Figma)
 const POCAO = {type:'multi', min:3, max:3, label:'Escolha rápida', title:'Poção do Detach', desc:'Escolha 3 ingredientes que você quer levar para o evento principal.', options:['Repertório','Networking','Ferramentas de IA','Portfólio','Oportunidades','Inspiração'],
@@ -938,8 +945,10 @@ const FX_DEFAULT = {formato:'Fantasma', estilo:'Liso', cor:'Roxo', q:'Dois olhos
 // abas e quando cada uma libera (momento da trilha concluído)
 const FX_TABS = [['corpo','Corpo','ghost',null],['cor','Cor','palette',null],['rosto','Rosto','smile','s0'],['bracos','Braços','hand','s1'],['pernas','Pernas','footprints','s1'],['acessorios','Acessórios','witch-hat','s2']];
 const FX_UNLOCK_TXT = {s0:'o Rosto (olhos e boca)', s1:'braços e pernas', s2:'chapéus e caudas', s3:'óculos e acessórios de cabeça', s4:'acessórios de pescoço e asas', s5:'as capas'};
-const fresh = () => ({onboarded:false, done:{}, data:{}, mascot:{...DEFAULT_MASCOT}, fuxo:{...FX_DEFAULT}, slot:2, testMode:true});
+const fresh = () => ({onboarded:false, done:{}, data:{}, mascot:{...DEFAULT_MASCOT}, fuxo:{...FX_DEFAULT}, slot:0, testMode:false});
 let S = load();
+function syncClock(){ if(!TEST_URL){ S.testMode = false; S.slot = liveSlot(); } }
+syncClock();
 function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const o = Object.assign(fresh(), JSON.parse(r)); o.mascot = {...DEFAULT_MASCOT, ...o.mascot}; o.fuxo = {...FX_DEFAULT, ...o.fuxo}; return o; } }catch(e){} return fresh(); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); if(S.user && S.user.email){ const a = JSON.parse(localStorage.getItem('esquenta-contas-v1') || '{}'); a[S.user.email] = S; localStorage.setItem('esquenta-contas-v1', JSON.stringify(a)); } }catch(e){} }
 const $ = s => document.querySelector(s);
@@ -1180,13 +1189,13 @@ function renderTrilha(){
   });
   h += `</ol>
   </div>
-  <div class="demo">
+  ${TEST_URL ? `<div class="demo">
     <p class="demo-label">Controles do protótipo</p>
     <label for="demo-slot">Simular horário do evento</label>
     <select id="demo-slot">${SLOTS.map((s,i)=>`<option value="${i}" ${i===S.slot?'selected':''}>${s.time} · ${esc(s.short)}</option>`).join('')}</select>
     <label class="demo-check"><input type="checkbox" id="demo-unlock" ${S.testMode?'checked':''}> Desbloquear tudo (atividades e itens do Rabisco)</label>
     <div class="demo-links"><button id="demo-tutorial">Ver tutorial de novo</button><button id="demo-reset">Reiniciar protótipo</button></div>
-  </div>
+  </div>` : ''}
   </div>`;
   const v = $('#view-trilha'), y = v.scrollTop;
   v.innerHTML = h; v.scrollTop = y;
@@ -1200,10 +1209,12 @@ function renderTrilha(){
     if(Math.abs(y - lastY) > 4){ nav.classList.toggle('is-compact', y > lastY && y > 40); lastY = y; }
   };
   v.onscroll = onScroll; top.classList.toggle('is-scrolled', v.scrollTop > 4);
+  if(TEST_URL){
   $('#demo-slot').onchange = e => { S.slot = +e.target.value; save(); renderTrilha(); };
   $('#demo-unlock').onchange = e => { S.testMode = e.target.checked; save(); renderTrilha(); };
   $('#demo-reset').onclick = () => { S = fresh(); save(); boot(); };
   $('#demo-tutorial').onclick = () => { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; };
+  }
   $('#avatar').onclick = openEditor;
   fxPaintAvatar(); fxBadge();
 }
@@ -1470,11 +1481,11 @@ function fxDraw(ctx, m, only){
   if(has('capa') && (o = fxAcc(m, 'capa'))){ const w = bw + 90; put('capas', o[1], 200 - w/2, caY, w, 260, o[2]); }
   if(has('cauda') && (o = fxAcc(m, 'cauda'))) put('caudas', o[1], cdX, 210, 120, 120, o[2]);
   if(has('cabeca') && (o = fxAcc(m, 'cabeca'))) put('cabeca', o[1], 100, cbY, 200, 130, o[2]);
-  if(has('bracos')) pair('bracos', ei*8 + (m.braco === 'Longo' ? 4 : 0) + Math.max(0, FX_MAOS.indexOf(m.mao)), brX, brY, brR, 1, fl ? 10 : 0);
+  if(has('bracos') && m.braco !== 'Sem') pair('bracos', ei*8 + (m.braco === 'Longo' ? 4 : 0) + Math.max(0, FX_MAOS.indexOf(m.mao)), brX, brY, brR, 1, fl ? 10 : 0);
   // pernas no mesmo afastamento em todos os formatos (o do Redondo: 91 / 98).
   // Peludo: os tufos engordam cada perna ~11px, então afasta esse tanto para o vão visível ficar igual
   const lg = fl ? 11 : (m.estilo === 'Espinhos' || m.estilo === 'Felpudo') ? 7 : 0;   // Espinhos e Felpudo: as pontas dos pés também se encostavam
-  if(has('pernas')) pair('pernas', Math.max(0, FX_CALCADOS.indexOf(m.calcado))*8 + (m.perna === 'Longa' ? 4 : 0) + ei, 91 - lg, 342, 98 + lg*2, 1, fl ? 11 : 0, m.calcado === 'Bota roxa');
+  if(has('pernas') && m.perna !== 'Sem') pair('pernas', Math.max(0, FX_CALCADOS.indexOf(m.calcado))*8 + (m.perna === 'Longa' ? 4 : 0) + ei, 91 - lg, 342, 98 + lg*2, 1, fl ? 11 : 0, m.calcado === 'Bota roxa');
   if(has('corpo')){
     // Triângulo + chapéu: a ponta do corpo entra no chapéu (corta o que passaria por cima da aba)
     const hat = m.formato === 'Triângulo' && (!only || only.includes('chapeu')) ? fxAcc(m, 'chapeu') : null;
@@ -1600,12 +1611,12 @@ function fxPanel(){
       : fxTiles('boca', FX_BOCAS, 'boca', {locked});
   } else if(t === 'bracos'){
     if(locked) h += fxLockCard('s1');
-    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('braco', ['Curto', 'Longo'], 'Tamanho dos braços');
-    h += `<h2 class="fx-h">Mão</h2>` + fxTiles('mao', FX_MAOS, 'mao', {labels:true, cols:4, locked});
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('braco', ['Curto', 'Longo', 'Sem'], 'Tamanho dos braços');
+    if(fxDraft.braco !== 'Sem') h += `<h2 class="fx-h">Mão</h2>` + fxTiles('mao', FX_MAOS, 'mao', {labels:true, cols:4, locked});
   } else if(t === 'pernas'){
     if(locked) h += fxLockCard('s1');
-    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('perna', ['Curta', 'Longa'], 'Tamanho das pernas');
-    h += `<h2 class="fx-h">Calçado</h2>` + fxTiles('calcado', FX_CALCADOS, 'calcado', {labels:true, cols:3, locked});
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('perna', ['Curta', 'Longa', 'Sem'], 'Tamanho das pernas');
+    if(fxDraft.perna !== 'Sem') h += `<h2 class="fx-h">Calçado</h2>` + fxTiles('calcado', FX_CALCADOS, 'calcado', {labels:true, cols:3, locked});
   } else {
     h += `<div class="fx-chips" role="tablist" aria-label="Tipo de acessório">${Object.entries(FX_ACC).map(([k, a]) => {
       const lk = fxStageNeed(a.need);
@@ -1656,6 +1667,17 @@ function fxRenderPiece(cv, sheet, i, mode, hex, minW, minH){
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(p, bx, by, bw, bh, (cv.width - bw*s)/2, (cv.height - bh*s)/2, bw*s, bh*s);
 }
+// moldura do calçado: junta a caixa das pernas de todos os calçados (mesma escala em todos os quadradinhos),
+// enquadra em quadrado e joga a sobra para cima, para a barra do corpo encostar na borda de cima
+let fxShoeKey = '', fxShoeCrop = null;
+function fxCalcadoCrop(){
+  const key = JSON.stringify({...fxDraft, calcado:null}); if(key === fxShoeKey) return fxShoeCrop;
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  FX_CALCADOS.forEach(c => { const [x, y, w, h] = fxBBox({...fxDraft, calcado:c}, ['pernas']); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + w); y1 = Math.max(y1, y + h); });
+  const bottom = y1 + 16, size = Math.max(x1 - x0 + 64, bottom - (y0 - 26));
+  fxShoeKey = key; fxShoeCrop = [(x0 + x1)/2 - size/2, bottom - size, size, size];
+  return fxShoeCrop;
+}
 function fxPaintThumbs(){
   $('#fx-panel').querySelectorAll('canvas[data-thumb]').forEach(cv => {
     const cat = cv.dataset.thumb, key = {formato:'formato', exp:'exp', boca:'boca', mao:'mao', calcado:'calcado'}[cat] || cat;
@@ -1663,6 +1685,7 @@ function fxPaintThumbs(){
     if(cat === 'exp') return fxRenderPiece(cv, 'olhos', fxEyeIdx(m), 1, hex, 110, 80);
     if(cat === 'boca') return fxRenderPiece(cv, 'boca', Math.max(0, FX_BOCAS.indexOf(m.boca)), 0, hex, 80, 80);
     if(FX_ACC[cat]){ const o = fxAcc(m, cat); if(o) return fxRenderPiece(cv, FX_ACC[cat].sheet, o[1], o[2], hex, 90, 90); }
+    if(cat === 'calcado'){ cv.classList.add('bleed'); return fxRender(cv, m, {crop: fxCalcadoCrop(), only:['pernas','corpo']}); }
     fxRender(cv, m, fxThumb(cat, m));
   });
 }
@@ -2147,8 +2170,17 @@ async function startStream(){
   stopStream();
   try{
     if(!navigator.mediaDevices?.getUserMedia) throw new Error('sem suporte');
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width:{ideal:1440}, height:{ideal:1800}}, audio:false});
-    video.srcObject = stream; await video.play(); camLive = true;
+    // pede o formato nativo 16:9 sem recorte (no celular em pé vira 9:16, igual ao template); pedir 4:5 fazia o iPhone recortar o sensor = zoom
+    const open = (w, h) => navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width:{ideal:w}, height:{ideal:h}, resizeMode:'none'}, audio:false});
+    stream = await open(1920, 1080);
+    video.srcObject = stream; await video.play();
+    // celular em pé mas a imagem veio deitada: pede de novo na orientação vertical
+    if(innerHeight > innerWidth && video.videoWidth > video.videoHeight){ stopStream(); stream = await open(1080, 1920); video.srcObject = stream; await video.play(); }
+    // se o aparelho permite controlar o zoom, usa o mínimo (campo de visão mais aberto)
+    const tr = stream.getVideoTracks()[0], cap = tr.getCapabilities ? tr.getCapabilities() : {};
+    if(cap.zoom) await tr.applyConstraints({advanced:[{zoom: cap.zoom.min}]}).catch(() => {});
+    camLive = true;
+    if(TEST_URL) toast(`Câmera: ${video.videoWidth}×${video.videoHeight}${cap.zoom ? ` · zoom ${cap.zoom.min}–${cap.zoom.max}` : ''}`);
   }catch(e){ camLive = false; }
   video.hidden = !camLive; video.classList.toggle('mirror', facing === 'user');
   $('#vf-fallback').hidden = camLive;
@@ -2213,12 +2245,15 @@ $('#retake').onclick = () => { $('#result').hidden = true; openCam(); };
 
 /* ================= boot ================= */
 function boot(){
+  syncClock();
   ['#sheet','#scrim','#cam','#result','#lvl','#editor','#signup'].forEach(s => $(s).hidden = true);
   if(S.onboarded && !S.user){ $('#onboarding').hidden = true; $('#main').hidden = true; openSignup(); }
   else if(S.onboarded){ $('#onboarding').hidden = true; $('#main').hidden = false; renderTrilha(); }
   else { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; }
 }
 boot();
+// a cada 30 s confere se começou um novo momento da programação e libera as atividades dele
+setInterval(() => { if(TEST_URL) return; const k = liveSlot(); if(k !== S.slot){ S.slot = k; save(); if(!$('#main').hidden) renderTrilha(); } }, 30000);
 })();
 </script>
 
