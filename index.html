@@ -47,14 +47,14 @@ button{cursor:pointer}
 
 /* ---------- fundo: gradiente animado ---------- */
 .bg{position:absolute;inset:0;overflow:hidden;background:var(--night);z-index:0;pointer-events:none;isolation:isolate;transform:translateZ(0)}
-.bg i{position:absolute;width:150%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;will-change:rotate,translate}
+.bg i{position:absolute;width:150%;aspect-ratio:1;border-radius:50%}
 .bg i:nth-child(1){left:-75%;top:-55%;background:radial-gradient(circle,rgba(255,75,39,.85) 0,rgba(255,75,39,0) 55%);transform-origin:60% 65%;animation:orbit 34s linear infinite,swayA 13s ease-in-out infinite alternate}
 .bg i:nth-child(2){right:-80%;top:-20%;background:radial-gradient(circle,rgba(135,64,233,.9) 0,rgba(135,64,233,0) 55%);transform-origin:40% 60%;animation:orbit 41s linear infinite reverse,swayB 15s ease-in-out infinite alternate}
 .bg i:nth-child(3){left:-50%;bottom:-70%;background:radial-gradient(circle,rgba(212,48,168,.8) 0,rgba(212,48,168,0) 55%);transform-origin:55% 35%;animation:orbit 29s linear infinite,swayA 11s ease-in-out infinite alternate-reverse}
 .bg i:nth-child(4){right:-60%;bottom:-60%;background:radial-gradient(circle,rgba(255,75,39,.55) 0,rgba(255,75,39,0) 50%);transform-origin:45% 45%;animation:orbit 44s linear infinite reverse,swayB 17s ease-in-out infinite alternate}
 .bg i:nth-child(5){left:-25%;top:10%;background:radial-gradient(circle,rgba(135,64,233,.6) 0,rgba(135,64,233,0) 50%);transform-origin:50% 80%;animation:orbit 37s linear infinite,swayA 19s ease-in-out infinite alternate}
 .bg::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,19,.35) 0%,rgba(11,6,19,.62) 45%,rgba(11,6,19,.86) 100%);z-index:1}
-.bg::after{content:"";position:absolute;inset:0;z-index:2;opacity:.13;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.bg::after{content:"";position:absolute;inset:0;z-index:2;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
 @keyframes orbit{to{rotate:360deg}}
 @keyframes swayA{from{translate:-8% -4%}to{translate:10% 8%}}
 @keyframes swayB{from{translate:8% 6%}to{translate:-10% -6%}}
@@ -160,9 +160,13 @@ button{cursor:pointer}
 #main .main-bg .veil{background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 100%)}
 #view-trilha{z-index:1}
 .trail-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;isolation:isolate}
-.trail-bg .blob{position:absolute;border-radius:50%;filter:blur(70px)}
+.trail-bg .blob{position:absolute}
 .trail-bg .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 40%,rgba(11,6,19,.85) 100%)}
-.trail-bg .tex{position:absolute;left:-74px;top:-21px;bottom:0;width:512px;opacity:.28;mix-blend-mode:color-dodge;background:url("assets/textura-figma-3x.jpg") 0 0/512px 376px repeat-y}
+.trail-bg .tex{display:none}
+/* fundo "assado": manchas + véu + textura (color-dodge) desenhados num canvas e usados como imagem.
+   Mesmo visual do Figma, sem mix-blend-mode/filter no CSS (o Safari do iPhone desenhava retângulos escuros) */
+.trail-bg.baked{background-size:100% 100%;background-repeat:no-repeat}
+.trail-bg.baked>.blob,.trail-bg.baked>.veil{display:none}
 .top{position:sticky;top:0;z-index:5;display:flex;flex-direction:column;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 20px 16px;border-radius:0 0 28px 28px;border-bottom:1px solid transparent;transition:background-color .25s ease,border-color .25s ease}
 /* sem fundo no topo da página; fundo e desfoque só depois de rolar */
 .top.is-scrolled{background:rgba(26,15,38,.62);border-bottom-color:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px)}
@@ -890,9 +894,44 @@ const ACTS = [
     trav:['Não travei','Layout com IA','Conteúdo com IA','Criar o repositório','Publicar no GitHub Pages'], ajuda:['O passo a passo','Os prompts','A explicação','Não me ajudou']},
   {id:'abobora', slot:'s5', type:'rating', label:'Avaliação', title:'Quantas abóboras valem esse evento?', desc:'Toque nas abóboras para avaliar'},
 ];
-const BLOBS = [['#FF4B27',.55,-266,122,420,420],['#FF4FFE',.7,188,412,420,420],['#8740E9',.6,171,-60,449,420],['#8740E9',.6,-185,646,449,420],['#D430A8',.38,-140,900,380,380],['#8740E9',.42,170,1500,420,420],['#FF4B27',.3,-120,1994,320,320]]
-  .map(([c,o,x,y,w,h]) => `<i class="blob" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c};opacity:${o}"></i>`).join('');
+const BLOB_DATA = [['#FF4B27',.55,-266,122,420,420],['#FF4FFE',.7,188,412,420,420],['#8740E9',.6,171,-60,449,420],['#8740E9',.6,-185,646,449,420],['#D430A8',.38,-140,900,380,380],['#8740E9',.42,170,1500,420,420],['#FF4B27',.3,-120,1994,320,320]];
+const BLOBS = BLOB_DATA
+  .map(([c,o,x,y,w,h]) => { const B = 140, r = w/2, R = r + B;   // círculo "desfocado" feito com gradiente (sem filter:blur, que o Safari do iPhone corta em retângulos)
+    return `<i class="blob" style="left:${x - B}px;top:${y - B}px;width:${w + 2*B}px;height:${h + 2*B}px;opacity:${o};background:radial-gradient(closest-side,${c} ${Math.round((r - 70)/R*100)}%,${c}80 ${Math.round(r/R*100)}%,${c}00 100%)"></i>`; }).join('');
 
+// desenha o fundo de cada tela num canvas: manchas, véu escuro e a textura em color-dodge (opacidade .28),
+// exatamente como as camadas do CSS faziam, e usa o resultado como background-image
+let TEX_IMG = null;
+const texReady = () => TEX_IMG || (TEX_IMG = new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'assets/textura-figma-3x.jpg'; }));
+const BAKED = {};
+async function bakeBg(el){
+  const ph = document.getElementById('phone'), W = ph.clientWidth, H = ph.clientHeight; if(!W || !H) return;
+  const main = el.classList.contains('main-bg'), base = '#0B0613', key = `${W}x${H}${main ? 'm' : ''}`;
+  if(!BAKED[key]) BAKED[key] = (async () => {
+    const tex = await texReady(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const c = document.createElement('canvas'); c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
+    const x = c.getContext('2d'); x.scale(dpr, dpr);
+    x.fillStyle = base; x.fillRect(0, 0, W, H);
+    BLOB_DATA.forEach(([col, o, bx, by, bw, bh]) => {
+      const B = 140, r = bw/2, R = r + B, cx = bx + bw/2, cy = by + bh/2;
+      x.save(); x.globalAlpha = o; x.translate(cx, cy); x.scale(1, (bh + 2*B)/(bw + 2*B));
+      const g = x.createRadialGradient(0, 0, 0, 0, 0, R);
+      g.addColorStop(Math.max(0, (r - 70)/R), col); g.addColorStop(r/R, col + '80'); g.addColorStop(1, col + '00');
+      x.fillStyle = g; x.fillRect(-R, -R, 2*R, 2*R); x.restore();
+    });
+    const v = x.createLinearGradient(0, 0, 0, H);
+    if(main){ v.addColorStop(0, 'rgba(11,6,19,.3)'); v.addColorStop(1, 'rgba(11,6,19,.62)'); }
+    else { v.addColorStop(0, 'rgba(11,6,19,.3)'); v.addColorStop(.4, 'rgba(11,6,19,.62)'); v.addColorStop(1, 'rgba(11,6,19,.85)'); }
+    x.fillStyle = v; x.fillRect(0, 0, W, H);
+    if(tex){ x.globalCompositeOperation = 'color-dodge'; x.globalAlpha = .28; for(let ty = -21; ty < H; ty += 376) x.drawImage(tex, -74, ty, 512, 376); }
+    const blob = await new Promise(r => c.toBlob(r, 'image/png')); c.width = c.height = 0;
+    return blob ? URL.createObjectURL(blob) : null;
+  })();
+  const url = await BAKED[key]; if(!url) return;
+  el.style.backgroundImage = `url(${url})`; el.classList.add('baked');
+}
+let bakeT = 0; new ResizeObserver(() => { clearTimeout(bakeT); bakeT = setTimeout(bakeAll, 200); }).observe(document.getElementById('phone') || document.body);
+const bakeAll = () => document.querySelectorAll('.trail-bg').forEach(el => { if(el.querySelector('.blob')) bakeBg(el); });
 /* Mascote: [id, nome, marcos necessários] */
 const BODY = [['amarelo','Amarelo','#FFD84D',0],['abobora','Abóbora','#FF9A3C',0],['fantasma','Fantasma','#EEE8F7',1],['roxo','Roxo','#A983FF',2],['zumbi','Zumbi','#8FD694',3],['rosa','Rosa','#FF8FCF',4]];
 const ACC = [['roxo','Roxo','#8740E9',0],['magenta','Magenta','#D430A8',0],['laranja','Laranja','#FF4B27',0],['noite','Noite','#2A1D3A',1],['verde','Verde','#3DDC97',2]];
@@ -1064,7 +1103,7 @@ function renderOB(){
     el.classList.toggle('on', on);
   });
   $('#ob-back').style.visibility = obStep === 0 ? 'hidden' : '';
-  if(!document.querySelector('#onboarding .blob')) $('#onboarding .trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  if(!document.querySelector('#onboarding .blob')) $('#onboarding .trail-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
   if(obStep === 1) fxLoad().then(() => { const cv = $('#ob-fuxo'); if(cv){ const m = S.fuxo || FX_DEFAULT, [bx, by, bw, bh] = fxBBox(m), sz = Math.max(bw, bh*300/290) + 16; fxRender(cv, m, {crop: [bx + bw/2 - sz/2, by + bh/2 - sz*290/300/2, sz, sz*290/300]}); } });
 }
 $('#ob-next').onclick = () => { if(obStep < OB.length-1){ obStep++; renderOB(); $('#ob-title').focus(); } else finishOB(); };
@@ -1092,7 +1131,7 @@ let suLogin = false;
 function openSignup(login = false){
   suLogin = login;
   const su = $('#signup'); su.hidden = false; su.classList.toggle('is-login', login);
-  if(!su.querySelector('.blob')) su.querySelector('.trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  if(!su.querySelector('.blob')) su.querySelector('.trail-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
   $('#su-title').textContent = login ? 'Bem-vindo de volta!' : 'Crie seu acesso';
   $('#su-sub').textContent = login ? 'Digite o e-mail que você usou' : 'Para não perder seu progresso, e nem seu Fuxo';
   $('#su-cta').firstChild.textContent = login ? 'Entrar' : 'Começar a trilha';
@@ -1145,7 +1184,7 @@ function trackHTML(opt={}){
 
 /* ================= trilha ================= */
 function renderTrilha(){
-  if(!document.querySelector('#main-bg .blob')) $('#main-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  if(!document.querySelector('#main-bg .blob')) $('#main-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
   const doneCount = ACTS.filter(a => S.done[a.id]).length, now = SLOTS[S.slot];
   const nowLeft = actsOf(now.id).filter(a => !S.done[a.id]).length;
   const nowSub = now.who || (nowLeft ? `${nowLeft} ${nowLeft === 1 ? 'atividade disponível' : 'atividades disponíveis'}` : 'Você fez tudo deste momento');
@@ -1668,14 +1707,15 @@ function fxRenderPiece(cv, sheet, i, mode, hex, minW, minH){
   ctx.drawImage(p, bx, by, bw, bh, (cv.width - bw*s)/2, (cv.height - bh*s)/2, bw*s, bh*s);
 }
 // moldura do calçado: junta a caixa das pernas de todos os calçados (mesma escala em todos os quadradinhos),
-// enquadra em quadrado e joga a sobra para cima, para a barra do corpo encostar na borda de cima
+// enquadra em quadrado com os pés no centro
 let fxShoeKey = '', fxShoeCrop = null;
 function fxCalcadoCrop(){
   const key = JSON.stringify({...fxDraft, calcado:null}); if(key === fxShoeKey) return fxShoeCrop;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   FX_CALCADOS.forEach(c => { const [x, y, w, h] = fxBBox({...fxDraft, calcado:c}, ['pernas']); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + w); y1 = Math.max(y1, y + h); });
-  const bottom = y1 + 16, size = Math.max(x1 - x0 + 64, bottom - (y0 - 26));
-  fxShoeKey = key; fxShoeCrop = [(x0 + x1)/2 - size/2, bottom - size, size, size];
+  // os pés ficam no meio do quadradinho (curta ou longa): centraliza na altura dos pés, ~45px acima da sola
+  const size = x1 - x0 + 70, cy = y1 - 45;
+  fxShoeKey = key; fxShoeCrop = [(x0 + x1)/2 - size/2, cy - size/2, size, size];
   return fxShoeCrop;
 }
 function fxPaintThumbs(){
@@ -1706,7 +1746,7 @@ function openEditor(tab){
   fxReturn = document.activeElement; fxDraft = {...S.fuxo}; fxTab = typeof tab === 'string' ? tab : 'corpo';
   // em Acessórios, começa pela pílula do acessório recém-liberado
   const firstAcc = fxAccNew()[0] || Object.keys(FX_ACC).find(k => !fxStageNeed(FX_ACC[k].need)); fxAccTab = firstAcc || 'chapeu';
-  if(!$('#fuxo .trail-bg .blob')) $('#fuxo .trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  if(!$('#fuxo .trail-bg .blob')) $('#fuxo .trail-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
   $('#fuxo').hidden = false; $('#fx-discard').hidden = true; $('#fx-hint').textContent = '';
   fxRenderAll(); $('#fx-back').focus();
 }
@@ -2189,7 +2229,7 @@ async function startStream(){
 function stopStream(){ if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; } }
 function openCam(){
   camReturn = camReturn || document.activeElement;
-  if(!document.querySelector('#cam .blob')){ ['#cam','#result'].forEach(id => $(id + ' .trail-bg').insertAdjacentHTML('afterbegin', BLOBS)); }
+  if(!document.querySelector('#cam .blob')){ ['#cam','#result'].forEach(id => $(id + ' .trail-bg').insertAdjacentHTML('afterbegin', BLOBS)); } bakeAll();
   $('#cam').hidden = false; $('#vf-fallback').hidden = false; $('#vf-msg').textContent = 'Abrindo a câmera…';
   syncSeg(); requestAnimationFrame(drawOverlay); startStream(); $('#shutter').focus();
 }
