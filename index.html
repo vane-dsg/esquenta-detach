@@ -891,7 +891,7 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
 const SLOTS = [
   {id:'s0', time:'08h30', short:'Coffee', title:'Credenciamento e coffee break', who:''},
   {id:'s1', time:'09h00', short:'Abertura', title:'Abertura do evento', who:''},
-  {id:'s2', time:'09h20', chipTime:'08h30', short:'Palestra', title:'Harness Design e o impacto em times de produtos digitais', who:'Palestra · Wallyngson Guedes'},
+  {id:'s2', time:'09h20', short:'Palestra', title:'Harness Design e o impacto em times de produtos digitais', who:'Palestra · Wallyngson Guedes'},
   {id:'s3', time:'10h20', short:'Detach', title:'Apresentação Detach + sorteio', who:''},
   {id:'s4', time:'10h45', short:'Workshop', title:'Do prompt ao portfólio: layout e conteúdo com IA, publicado no GitHub Pages', who:'Workshop · Vanessa Sousa'},
   {id:'s5', time:'11h45', short:'Encerramento', title:'Até a próxima!', who:''},
@@ -1118,7 +1118,7 @@ let obStep = 0;
 // onboarding (Figma 2159:727): textos e layout das 3 telas
 const OB = [
   {title:'Boas vindas ao esquenta DETACH!', text:'Cada momento da programação é um marco na barra: <b>complete as atividades de um momento para fechar o marco</b>',
-   art:() => `${trackHTML({demo:true})}<div class="ob-stack" aria-hidden="true"><div class="stage-card"><div class="stage-head"><span class="chip-time">08h30</span></div><h3>Aproveite o evento!</h3>
+   art:() => `${trackHTML({demo:true})}<div class="ob-stack" aria-hidden="true"><div class="stage-card"><div class="stage-head"><span class="chip-time">${SLOTS[0].time}</span></div><h3>Aproveite o evento!</h3>
      <ul class="acts">${[['Check-in','Concluída',1],['Monstro do design','Escolha rápida',0],['Conexão no coffee','Networking',0]].map(([t, m, d]) => `<li><span class="act ${d ? 'is-done' : ''}"><span class="check">${d ? ICON_CHECK : ''}</span><span class="act-text"><span class="act-title">${t}</span><span class="act-meta">${m}</span></span><span class="chev">${ICON_CHEV}</span></span></li>`).join('')}</ul></div></div>`},
   {title:'Conheça o Fuxo', sub:'O nome dele vem de {UXFo}r e ele é seu monstrinho nesse evento!', text:'<b>Cada marco concluído desbloqueia fantasias e acessórios para personalizar o Fuxo</b>',
    art:() => `<canvas class="ob-fuxo" id="ob-fuxo" role="img" aria-label="O Fuxo"></canvas><div class="ob-cats" aria-hidden="true">${FX_TABS.map(([id, label, icon], i) => `<span class="fx-cat" aria-selected="${i === 0}"><span class="ic">${lu(icon, 2)}</span><span>${label}</span></span>`).join('')}</div>`},
@@ -1297,7 +1297,7 @@ function renderTrilha(){
     <ol class="stages">`;
   SLOTS.forEach((s,i) => {
     const st = slotState(i), acts = actsOf(s.id), all = stageDone(s.id);
-    const timeChip = `<span class="chip-time">${s.chipTime || s.time}</span>`;
+    const timeChip = `<span class="chip-time">${s.time}</span>`;
     const head = st === 'locked' ? `<span class="chip-line chip-wait">Libera às ${s.time}</span>`
       : st === 'open' ? `${timeChip}<span class="chip-line chip-wait">Liberado no modo teste</span>`
       : all ? `${timeChip}<span class="chip-line chip-done">Concluído</span>`
