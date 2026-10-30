@@ -343,6 +343,7 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .fx-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
 .fx-seg button{flex:1;min-width:0;min-height:38px;border:0;border-radius:999px;background:none;color:var(--muted);font-weight:800;font-size:13px;white-space:nowrap}
 .fx-seg button[aria-checked="true"]{background:#FF2D03;color:#fff}
+.fx-seg button[aria-disabled="true"]{opacity:.45}
 .fx-gap{height:14px}
 .fx-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px}
 .fx-grid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1704,7 +1705,7 @@ function fxThumb(cat, m){
     capa:    {crop:[15, caY - 60, 370, 380], only:['capa', ...face]},
   }[cat];
 }
-const fxSeg = (key, opts, label) => `<div class="fx-seg" role="radiogroup" aria-label="${label}">${opts.map(o => `<button role="radio" data-fk="${key}" data-fv="${esc(o)}" aria-checked="${fxDraft[key] === o}">${esc(o)}</button>`).join('')}</div>`;
+const fxSeg = (key, opts, label, locked = false) => `<div class="fx-seg" role="radiogroup" aria-label="${label}">${opts.map(o => `<button role="radio" data-fk="${key}" data-fv="${esc(o)}" aria-checked="${fxDraft[key] === o}" ${locked ? 'aria-disabled="true"' : ''}>${esc(o)}</button>`).join('')}</div>`;
 // tile = poço claro com a peça desenhada; o rótulo vai embaixo só onde o desenho sozinho não basta
 function fxTiles(key, values, thumb, {labels = false, cols = 4, locked = false, none = false} = {}){
   let h = `<div class="fx-grid c${cols}" role="radiogroup">`;
@@ -1728,15 +1729,15 @@ function fxPanel(){
     // Olhos e Boca em pílulas, no mesmo padrão de Acessórios
     h += `<div class="fx-chips" role="tablist" aria-label="Parte do rosto">${[['olhos','Olhos'],['boca','Boca']].map(([k, l]) => `<button class="fx-chip" role="tab" data-rosto="${k}" aria-selected="${fxRostoTab === k}">${l}</button>`).join('')}</div><div class="fx-gap"></div>`;
     h += fxRostoTab === 'olhos'
-      ? fxSeg('q', ['Dois olhos', 'Um olho'], 'Quantidade de olhos') + `<div class="fx-gap"></div>` + fxTiles('exp', FX_EXP, 'exp', {locked})
+      ? fxSeg('q', ['Dois olhos', 'Um olho'], 'Quantidade de olhos', locked) + `<div class="fx-gap"></div>` + fxTiles('exp', FX_EXP, 'exp', {locked})
       : fxTiles('boca', FX_BOCAS, 'boca', {locked});
   } else if(t === 'bracos'){
     if(locked) h += fxLockCard('s1');
-    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('braco', ['Curto', 'Longo', 'Sem'], 'Tamanho dos braços');
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('braco', ['Curto', 'Longo', 'Sem'], 'Tamanho dos braços', locked);
     if(fxDraft.braco !== 'Sem') h += `<h2 class="fx-h">Mão</h2>` + fxTiles('mao', FX_MAOS, 'mao', {labels:true, cols:4, locked});
   } else if(t === 'pernas'){
     if(locked) h += fxLockCard('s1');
-    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('perna', ['Curta', 'Longa', 'Sem'], 'Tamanho das pernas');
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('perna', ['Curta', 'Longa', 'Sem'], 'Tamanho das pernas', locked);
     if(fxDraft.perna !== 'Sem') h += `<h2 class="fx-h">Calçado</h2>` + fxTiles('calcado', FX_CALCADOS, 'calcado', {labels:true, cols:3, locked});
   } else {
     h += `<div class="fx-chips" role="tablist" aria-label="Tipo de acessório">${Object.entries(FX_ACC).map(([k, a]) => {
