@@ -526,8 +526,16 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .sw[aria-disabled="true"]{opacity:.35}
 .sw .lock{position:absolute;inset:0;display:grid;place-items:center;color:#12091C}
 .sw .lock svg{width:18px;height:18px}
-.discard{position:absolute;left:16px;right:16px;bottom:16px;z-index:3;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--surface-strong)}
-.discard p{margin:0 0 4px;font-weight:800;text-align:center}
+.discard{position:absolute;inset:0;z-index:30}
+/* aviso de sair sem salvar: mesma gaveta das atividades (vidro escuro, sobe de baixo, scrim por trás) */
+.discard-scrim{position:absolute;inset:0;background:rgba(5,2,10,.38);animation:sc-in .3s ease both}
+.discard-sheet{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:0 20px calc(18px + env(safe-area-inset-bottom,0px));background:rgba(8,4,14,.5);-webkit-backdrop-filter:blur(26px) saturate(150%);backdrop-filter:blur(26px) saturate(150%);border:1px solid rgba(255,255,255,.12);border-bottom:0;border-radius:30px 30px 0 0;animation:sheet-in .38s cubic-bezier(.2,.8,.2,1) both}
+.discard.out .discard-scrim{animation:sc-out .26s ease both}
+.discard.out .discard-sheet{animation:sheet-out .26s cubic-bezier(.4,0,.8,.4) both}
+.discard-sheet h2{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.2;margin:18px 0 18px;text-wrap:balance}
+.discard-acts{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+.discard-acts .btn-cta{background:#FF2D03;color:#fff;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
+@media (prefers-reduced-motion:reduce){.discard-scrim,.discard-sheet,.discard.out .discard-scrim,.discard.out .discard-sheet{animation:none}}
 
 /* ---------- Drawer de atividade ---------- */
 .scrim{position:absolute;inset:0;background:rgba(5,2,10,.38);z-index:20;animation:sc-in .3s ease both}
@@ -745,10 +753,12 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
       <p class="ed-hint" id="ed-hint" aria-live="polite">Toque nas opções para vestir o Rabisco</p>
       <div class="ed-tabs" role="tablist" aria-label="Partes do Rabisco" id="ed-tabs"></div>
       <div class="ed-panel" id="ed-panel" role="tabpanel"></div>
-      <div class="discard" id="discard" role="alertdialog" aria-labelledby="discard-t" hidden>
-        <p id="discard-t">Descartar as alterações no Rabisco?</p>
-        <button class="btn btn-primary" id="discard-keep">Continuar editando</button>
-        <button class="btn btn-ghost" id="discard-yes">Descartar</button>
+      <div class="discard" id="discard" role="alertdialog" aria-modal="true" aria-labelledby="discard-t" hidden>
+        <div class="discard-scrim" data-keep="discard-keep"></div>
+        <div class="discard-sheet"><div class="grabber" aria-hidden="true"></div>
+          <h2 id="discard-t">Descartar as alterações no Rabisco?</h2>
+          <div class="discard-acts"><button class="btn btn-cta" id="discard-keep">Continuar editando</button><button class="btn btn-ghost" id="discard-yes">Descartar</button></div>
+        </div>
       </div>
     </section>
 
@@ -764,10 +774,12 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
       <div class="fx-cats" id="fx-cats" role="tablist" aria-label="Partes do Fuxo"></div>
       <div class="fx-panel" id="fx-panel" role="tabpanel"></div>
       <p class="sr-only" id="fx-hint" aria-live="polite"></p>
-      <div class="discard" id="fx-discard" role="alertdialog" aria-labelledby="fx-discard-t" hidden>
-        <p id="fx-discard-t">Sair sem salvar as mudanças no Fuxo?</p>
-        <button class="btn btn-primary" id="fx-discard-keep">Continuar editando</button>
-        <button class="btn btn-ghost" id="fx-discard-yes">Sair sem salvar</button>
+      <div class="discard" id="fx-discard" role="alertdialog" aria-modal="true" aria-labelledby="fx-discard-t" hidden>
+        <div class="discard-scrim" data-keep="fx-discard-keep"></div>
+        <div class="discard-sheet"><div class="grabber" aria-hidden="true"></div>
+          <h2 id="fx-discard-t">Sair sem salvar as mudanças no Fuxo?</h2>
+          <div class="discard-acts"><button class="btn btn-cta" id="fx-discard-keep">Continuar editando</button><button class="btn btn-ghost" id="fx-discard-yes">Sair sem salvar</button></div>
+        </div>
       </div>
     </section>
 
@@ -1360,7 +1372,7 @@ const changed = () => JSON.stringify(draft) !== JSON.stringify(S.mascot);
 function closeEditor(){ $('#editor').hidden = true; draft = null; if(edReturn && document.contains(edReturn)) edReturn.focus(); }
 $('#ed-save').onclick = () => { const c = changed(); S.mascot = {...draft}; save(); closeEditor(); renderTrilha(); if(c) toast('Rabisco atualizado'); };
 $('#ed-cancel').onclick = () => { if(changed()){ $('#discard').hidden = false; $('#discard-keep').focus(); } else closeEditor(); };
-$('#discard-keep').onclick = () => { $('#discard').hidden = true; $('#ed-cancel').focus(); };
+$('#discard-keep').onclick = () => { discardClose('#discard'); $('#ed-cancel').focus(); };
 $('#discard-yes').onclick = closeEditor;
 
 /* ================= Fuxo: renderização em camadas ================= */
@@ -1802,7 +1814,10 @@ $('#fx-export').onclick = async () => {
   } finally { delete btn.dataset.busy; }
 };
 $('#fx-back').onclick = () => { if(fxChanged()){ $('#fx-discard').hidden = false; $('#fx-discard-keep').focus(); } else closeFuxo(); };
-$('#fx-discard-keep').onclick = () => { $('#fx-discard').hidden = true; $('#fx-back').focus(); };
+$('#fx-discard-keep').onclick = () => { discardClose('#fx-discard'); $('#fx-back').focus(); };
+// fechar o aviso: a gaveta desce e o scrim some antes de esconder; tocar fora = continuar editando
+function discardClose(sel){ const d = $(sel); if(d.hidden || d.classList.contains('out')) return; d.classList.add('out'); setTimeout(() => { d.hidden = true; d.classList.remove('out'); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 260); }
+document.querySelectorAll('.discard-scrim').forEach(sc => sc.onclick = () => $('#' + sc.dataset.keep).click());
 $('#fx-discard-yes').onclick = closeFuxo;
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#fuxo').hidden){ e.stopPropagation(); $('#fx-discard').hidden ? $('#fx-back').click() : $('#fx-discard-keep').click(); } }, true);
 
@@ -2196,7 +2211,13 @@ async function drawTemplate(ctx, W, H){
   await fxLoad();
   // posição e escala exatas da instância do Monstrinho no Figma (x 674, y 1129, 400×520 → 348.94×453.63)
   const k = W / 1080, ky = H / 1920, sc = .87236 * k;
-  ctx.save(); ctx.translate(674*k, 1129*ky); ctx.scale(sc, sc); fxDraw(ctx, S.fuxo); ctx.restore();
+  // sem pernas: desce o Fuxo até a base do corpo ficar onde ficariam os pés, apoiado na faixa preta
+  let dy = 0;
+  if(S.fuxo.perna === 'Sem'){
+    const ref = fxBBox({...S.fuxo, perna:'Curta'}, ['pernas','corpo']), own = fxBBox(S.fuxo, ['corpo']);
+    dy = (ref[1] + ref[3]) - (own[1] + own[3]);
+  }
+  ctx.save(); ctx.translate(674*k, 1129*ky + dy*sc); ctx.scale(sc, sc); fxDraw(ctx, S.fuxo); ctx.restore();
 }
 async function drawOverlay(){
   const r = overlay.getBoundingClientRect(); if(!r.width) return;
