@@ -128,6 +128,19 @@ button{cursor:pointer}
 .su-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);font-variation-settings:"opsz" 14}
 .su-fuxo{width:110px;height:110px;margin:auto 0 10px;flex:0 0 auto}   /* margem automática em cima e no rodapé: o bloco fica centralizado no espaço livre */
 .su-sub{max-width:none;font-size:clamp(13px,3.75vw,15px);line-height:1.4;white-space:nowrap}
+.su-form{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.su-form[hidden]{display:none}
+.su-field{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left}
+.su-field>span{font-family:var(--f-dm);font-weight:700;font-size:14px;color:var(--fg)}
+.su-field input{width:100%;min-height:52px;padding:0 18px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);color:var(--fg);font-family:var(--f-dm);font-weight:600;font-size:16px}
+.su-field input::placeholder{color:rgba(189,177,204,.6)}
+.su-field input:focus{outline:none;border-color:#FF2D03;box-shadow:0 0 0 3px rgba(255,45,3,.25)}
+.su-field input[aria-invalid="true"]{border-color:#FF8A7A}
+.su.is-login #su-name-wrap{display:none}
+.su-form .su-cta{margin-top:18px}
+.su-or{width:100%;display:flex;align-items:center;gap:12px;margin:10px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+.su-or::before,.su-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.16)}
+.su-switch{border:0;background:none;color:var(--fg);font-family:var(--f-dm);font-weight:700;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:4px}
 .su-err{min-height:0;text-align:center;font-size:13px;font-weight:600;color:#FF8A7A}
 .su-err:empty{display:none}
 .su-note{margin:14px 0 0;font-size:13px;color:var(--muted)}
@@ -713,10 +726,25 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
         <canvas class="su-fuxo" id="su-fuxo" aria-hidden="true"></canvas>
         <h1 id="su-title" tabindex="-1">Crie seu acesso</h1>
         <p class="ob-sub su-sub" id="su-sub">Para não perder seu progresso, e nem seu Fuxo</p>
-        <p class="su-note">Entre com sua conta Google: sua trilha fica salva e você continua em qualquer aparelho</p>
+        <p class="su-note">Sua trilha fica salva e você continua em qualquer aparelho</p>
         <div class="su-foot">
           <button class="ob-btn su-cta su-google" id="su-cta" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continuar com Google</span></button>
           <small class="su-err" id="su-err" role="alert"></small>
+          <p class="su-or" aria-hidden="true">ou</p>
+          <button class="su-switch" id="su-mail-open" type="button">Usar e-mail e senha</button>
+          <form class="su-form" id="su-form" novalidate hidden>
+            <label class="su-field" id="su-name-wrap"><span>Nome e sobrenome</span>
+              <input id="su-name" name="name" autocomplete="name" autocapitalize="words" placeholder="Ex.: Ana Souza" aria-describedby="su-name-err">
+              <small class="su-err" id="su-name-err" aria-live="polite"></small></label>
+            <label class="su-field"><span>E-mail</span>
+              <input id="su-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="voce@email.com" aria-describedby="su-email-err">
+              <small class="su-err" id="su-email-err" aria-live="polite"></small></label>
+            <label class="su-field"><span>Senha</span>
+              <input id="su-pass" name="password" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres" aria-describedby="su-pass-err">
+              <small class="su-err" id="su-pass-err" aria-live="polite"></small></label>
+            <button class="ob-btn ob-next su-cta" id="su-mail-cta" type="submit"><span>Criar conta</span><i data-lu="arrow-right"></i></button>
+            <button class="su-switch" id="su-switch" type="button">Já tenho conta com e-mail</button>
+          </form>
         </div>
       </div>
     </section>
@@ -1155,7 +1183,7 @@ async function adoptUser(u){
 function openSignup(){
   const su = $('#signup'); su.hidden = false;
   if(!su.querySelector('.blob')) su.querySelector('.trail-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
-  suBusy(false); $('#su-err').textContent = '';
+  suBusy(false); $('#su-err').textContent = ''; mailMode(false); $('#su-form').hidden = true; $('#su-mail-open').hidden = false;
   fxLoad().then(() => { const cv = $('#su-fuxo'), m = S.fuxo || FX_DEFAULT, [bx, by, bw, bh] = fxBBox(m), sz = Math.max(bw, bh) + 40; fxRender(cv, m, {crop:[bx + bw/2 - sz/2, by + bh/2 - sz/2, sz, sz]}); });
   $('#su-title').focus();
 }
@@ -1169,6 +1197,50 @@ $('#su-cta').onclick = async () => {
 };
 // ao voltar com o botão "voltar" do navegador, a página pode vir do cache com o botão travado em "Abrindo…"
 window.addEventListener('pageshow', e => { if(e.persisted) suBusy(false); });
+
+// e-mail e senha: sem confirmação por e-mail (o envio grátis do Supabase é limitado a poucos por hora), a conta já entra
+const normEmail = e => e.trim().toLowerCase();
+const okEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+let suLogin = false;
+function mailMode(login){
+  suLogin = login; $('#signup').classList.toggle('is-login', login);
+  $('#su-mail-cta span').textContent = login ? 'Entrar' : 'Criar conta';
+  $('#su-switch').textContent = login ? 'Ainda não tenho conta' : 'Já tenho conta com e-mail';
+  $('#su-pass').setAttribute('autocomplete', login ? 'current-password' : 'new-password');
+  ['name','email','pass'].forEach(k => suError(k, ''));
+}
+function suError(k, msg){ const i = $('#su-' + k); if(msg) i.setAttribute('aria-invalid', 'true'); else i.removeAttribute('aria-invalid'); $('#su-' + k + '-err').textContent = msg; return !msg; }
+['name','email','pass'].forEach(k => $('#su-' + k).addEventListener('input', () => { if($('#su-' + k).getAttribute('aria-invalid') === 'true') suError(k, ''); }));
+$('#su-mail-open').onclick = () => { $('#su-mail-open').hidden = true; $('#su-form').hidden = false; mailMode(false); $('#su-name').focus(); };
+$('#su-switch').onclick = () => { mailMode(!suLogin); $(suLogin ? '#su-email' : '#su-name').focus(); };
+$('#su-form').onsubmit = async e => {
+  e.preventDefault();
+  const name = $('#su-name').value.trim().replace(/\s+/g, ' '), email = normEmail($('#su-email').value), password = $('#su-pass').value;
+  let ok = true;
+  if(!suLogin) ok = suError('name', !name ? 'Digite seu nome e sobrenome' : name.split(' ').length < 2 ? 'Inclua também o sobrenome' : '') && ok;
+  ok = suError('email', !email ? 'Digite seu e-mail' : !okEmail(email) ? 'Confira o e-mail: parece que falta algo (ex.: voce@email.com)' : '') && ok;
+  ok = suError('pass', !password ? 'Digite sua senha' : !suLogin && password.length < 6 ? 'A senha precisa ter pelo menos 6 caracteres' : '') && ok;
+  if(!ok){ (document.querySelector('#su-form [aria-invalid="true"]'))?.focus(); return; }
+  if(!sb){ suError('email', 'O login ainda não está configurado.'); return; }
+  const cta = $('#su-mail-cta'), label = cta.querySelector('span').textContent;
+  cta.disabled = true; cta.querySelector('span').textContent = suLogin ? 'Entrando…' : 'Criando…';
+  const {data, error} = suLogin ? await sb.auth.signInWithPassword({email, password})
+    : await sb.auth.signUp({email, password, options: {data: {full_name: name}}});
+  cta.disabled = false; cta.querySelector('span').textContent = label;
+  if(error || !data.session){
+    const c = error && error.code;
+    if(c === 'invalid_credentials'){ suError('pass', 'E-mail ou senha não conferem. Confira e tente de novo.'); $('#su-pass').focus(); }
+    else if(c === 'user_already_exists' || c === 'email_exists'){ mailMode(true); $('#su-email').value = email; suError('email', 'Esse e-mail já tem conta. Digite sua senha para entrar.'); $('#su-pass').focus(); }
+    else if(c === 'weak_password'){ suError('pass', 'Essa senha é muito fraca. Tente uma maior, com letras e números.'); $('#su-pass').focus(); }
+    else if(c === 'email_address_invalid'){ suError('email', 'Esse e-mail não foi aceito. Confira se digitou certo.'); $('#su-email').focus(); }
+    else suError('pass', 'Não deu para entrar agora. Confira a internet e tente de novo.');
+    if(error) console.warn('Supabase', error.code, error.message);
+    return;
+  }
+  const res = await adoptUser(data.user).catch(err => { console.warn(err); return {back: false}; }), first = S.user.name.split(' ')[0];
+  enterTrail();
+  toast(suLogin && res.back ? `Que bom te ver de novo, ${first}!` : `Trilha salva na sua conta, ${first}!`);
+};
 
 /* ================= barra de progresso do evento ================= */
 // A barra mostra em que momento o EVENTO está (Figma 2045:53): marcos passados em laranja, o atual com anel.
