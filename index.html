@@ -1,0 +1,2226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12091C">
+<title>Trilha Esquenta Detach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: app de tela única em moldura de celular. Fundo = gradiente animado (laranja, roxo, magenta) sobre roxo-noite.
+   Topo fixo com UMA barra de progresso do evento, segmentada pelos 5 momentos da programação.
+   Componentes seguem a anatomia de shadcn/HeroUI (Card, Button, Chip, Tabs, Drawer, Progress, Avatar). Tema único escuro, por escolha. */
+:root{
+  --night:#0B0613; --night-2:#140B20;
+  --surface:rgba(26,15,38,.62); --surface-strong:#1B1128; --surface-hi:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.28);
+  --fg:#F7F2FB; --muted:#BDB1CC; --dim:#8E829F;
+  --orange:#FF2D03; --purple:#8740E9; --magenta:#D430A8;
+  --grad:linear-gradient(100deg,#FF4B27 0%,#D430A8 52%,#8740E9 100%);
+  --success:#3DDC97; --danger:#FF8A7A;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-brico:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-dm:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{height:100%}
+body{height:100%;margin:0;background-color:#07040C;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.3px);background-size:22px 22px;color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #FFB199;outline-offset:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.mono{font-family:var(--f-mono)}
+.glass{background:var(--surface);-webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);border:1px solid var(--line)}
+
+/* ---------- moldura ---------- */
+.stage{height:100%;display:grid;place-items:center;padding-block:24px}
+.phone{position:relative;width:413px;height:min(872px,100%);border:10px solid #1C1426;border-radius:48px;overflow:hidden;background:var(--night);box-shadow:0 30px 80px -20px rgba(135,64,233,.45),0 0 0 1px rgba(255,255,255,.06)}
+@media (max-width:480px){.stage{display:block;padding:0}.phone{width:100%;height:100%;border:0;border-radius:0;box-shadow:none}}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;z-index:1}
+.pad{padding-inline:20px}
+
+/* ---------- fundo: gradiente animado ---------- */
+.bg{position:absolute;inset:0;overflow:hidden;background:var(--night);z-index:0;pointer-events:none}
+.bg i{position:absolute;width:150%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;will-change:rotate,translate}
+.bg i:nth-child(1){left:-75%;top:-55%;background:radial-gradient(circle,rgba(255,75,39,.85) 0,rgba(255,75,39,0) 55%);transform-origin:60% 65%;animation:orbit 34s linear infinite,swayA 13s ease-in-out infinite alternate}
+.bg i:nth-child(2){right:-80%;top:-20%;background:radial-gradient(circle,rgba(135,64,233,.9) 0,rgba(135,64,233,0) 55%);transform-origin:40% 60%;animation:orbit 41s linear infinite reverse,swayB 15s ease-in-out infinite alternate}
+.bg i:nth-child(3){left:-50%;bottom:-70%;background:radial-gradient(circle,rgba(212,48,168,.8) 0,rgba(212,48,168,0) 55%);transform-origin:55% 35%;animation:orbit 29s linear infinite,swayA 11s ease-in-out infinite alternate-reverse}
+.bg i:nth-child(4){right:-60%;bottom:-60%;background:radial-gradient(circle,rgba(255,75,39,.55) 0,rgba(255,75,39,0) 50%);transform-origin:45% 45%;animation:orbit 44s linear infinite reverse,swayB 17s ease-in-out infinite alternate}
+.bg i:nth-child(5){left:-25%;top:10%;background:radial-gradient(circle,rgba(135,64,233,.6) 0,rgba(135,64,233,0) 50%);transform-origin:50% 80%;animation:orbit 37s linear infinite,swayA 19s ease-in-out infinite alternate}
+.bg::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,19,.35) 0%,rgba(11,6,19,.62) 45%,rgba(11,6,19,.86) 100%);z-index:1}
+.bg::after{content:"";position:absolute;inset:0;z-index:2;opacity:.13;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes orbit{to{rotate:360deg}}
+@keyframes swayA{from{translate:-8% -4%}to{translate:10% 8%}}
+@keyframes swayB{from{translate:8% 6%}to{translate:-10% -6%}}
+
+/* ---------- Button (shadcn: default / secondary / ghost · HeroUI: solid / bordered / light) ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;padding:0 22px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:16px;transition:transform .12s ease,background .2s ease}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn-primary{background:var(--fg);color:#12091C}
+.btn-primary:disabled{background:rgba(255,255,255,.14);color:var(--dim);cursor:not-allowed}
+.btn-secondary{background:var(--surface-hi);border-color:var(--line-strong);color:var(--fg)}
+.btn-ghost{background:transparent;color:var(--fg);min-height:46px;text-decoration:underline;text-underline-offset:4px}
+.btn-icon{width:48px;height:48px;min-height:0;padding:0;flex:0 0 auto;border-radius:50%}
+.btn svg{width:22px;height:22px}
+
+/* ---------- Chip / Badge ---------- */
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;border:1px solid var(--line-strong);color:var(--fg);white-space:nowrap}
+.chip-now{background:var(--fg);color:#12091C;border-color:transparent}
+.chip-now::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--orange);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+.chip-done{background:rgba(61,220,151,.14);color:var(--success);border-color:transparent}
+.chip-muted{color:var(--muted);border-style:dashed}
+.time{font-family:var(--f-mono);font-size:12px;font-weight:700;background:rgba(255,255,255,.1);border-radius:8px;padding:3px 8px}
+
+/* ---------- onboarding ---------- */
+/* ---------- onboarding (Figma 2159:727) ---------- */
+.ob{background:#0B0613;isolation:isolate;overflow:hidden}
+.ob-progress{position:relative;z-index:1;display:flex;gap:12px;padding:calc(22px + env(safe-area-inset-top,0px)) 20px 0}
+/* barra do onboarding: o segmento enche da esquerda para a direita (estilo stories), com um brilho que passa por cima */
+.ob-progress span{position:relative;height:6px;flex:1;border-radius:3px;background:rgba(0,0,0,.55);overflow:hidden}
+.ob-progress span::before{content:"";position:absolute;inset:0;border-radius:inherit;background:#FF2D03;transform:scaleX(0);transform-origin:left center;transition:transform .55s cubic-bezier(.65,0,.25,1)}
+.ob-progress span.on::before{transform:scaleX(1)}
+.ob-progress span.fill{animation:ob-glow .9s ease-out .3s}
+@keyframes ob-glow{0%,100%{box-shadow:0 0 0 rgba(255,45,3,0)}40%{box-shadow:0 0 12px rgba(255,45,3,.8)}}
+.ob-progress span.unfill::before{transition:transform .45s cubic-bezier(.4,0,.2,1)}   /* voltar: recolhe suave para a esquerda (o caminho inverso do encher) */
+@media (prefers-reduced-motion:reduce){.ob-progress span::before{transition:none}.ob-progress span.fill{animation:none}}
+.ob-body{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 20px 12px;scrollbar-width:none}
+.ob-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);text-wrap:balance;font-variation-settings:"opsz" 14}
+.ob-sub{margin:10px 0 0;font-family:var(--f-dm);font-weight:500;font-size:17px;line-height:1.35;color:var(--fg);max-width:270px}
+.ob-text{margin:auto 0 0;padding-top:24px;font-family:var(--f-dm);font-weight:500;font-size:16px;line-height:1.4;color:var(--fg);max-width:340px;text-wrap:balance}
+.ob-text b{font-weight:800}
+.ob-art{width:100%;display:flex;flex-direction:column;align-items:center;margin-top:28px}
+/* 1 · barra + pilha de cards */
+.ob-art .track{width:100%;pointer-events:none}
+.ob-stack{position:relative;width:100%;margin-top:34px;text-align:left}
+.ob-stack::before,.ob-stack::after{content:"";position:absolute;left:12px;right:12px;bottom:-14px;height:60px;border-radius:26px;background:rgba(0,0,0,.31);border:1px solid rgba(255,255,255,.08);z-index:-1}
+.ob-stack::after{left:24px;right:24px;bottom:-28px;opacity:.6}
+.ob-stack .stage-card{pointer-events:none}
+.ob-stack .act .chev{display:flex}
+/* 2 · Fuxo + abas da personalização */
+.ob-fuxo{width:300px;height:290px}
+.ob-cats{display:flex;gap:4px;margin-top:20px;padding:8px;border-radius:14px;background:rgba(255,255,255,.06);pointer-events:none}
+.ob-cats .fx-cat{flex:0 0 46px;font-size:9px;gap:4px}
+.ob-cats .fx-cat .ic{width:38px;height:38px;border-radius:12px}
+.ob-cats .fx-cat .ic svg{width:18px;height:18px}
+/* 3 · dois stories sobrepostos */
+.ob-stories{position:relative;width:353px;max-width:100%;height:491px;margin-top:5px;flex:0 0 auto}
+.ob-stories img{position:absolute;display:block}
+.ob-stories .s1{left:10px;top:0;width:196px;height:349px}
+.ob-stories .s2{left:131px;top:114px;width:212px;height:377px}
+.ob-foot{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:16px 31px calc(56px + env(safe-area-inset-bottom,0px))}
+.ob-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:999px;font-family:var(--f-dm);font-weight:700;font-size:16px}
+.ob-btn svg{width:20px;height:20px}
+.ob-back{background:#000;color:#fff}
+.ob-next{background:#FF2D03;color:#fff;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
+.ob-btn:active{transform:scale(.97)}
+.ob-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* ---------- cadastro (mesmos componentes do onboarding) ---------- */
+.su-body{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(40px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
+.su-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);font-variation-settings:"opsz" 14}
+.su-fuxo{width:110px;height:110px;margin:auto 0 10px;flex:0 0 auto}   /* margem automática em cima e no rodapé: o bloco fica centralizado no espaço livre */
+.su-sub{max-width:none;font-size:clamp(13px,3.75vw,15px);line-height:1.4;white-space:nowrap}
+.su-field{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:20px;text-align:left}
+.su-field+.su-field{margin-top:14px}
+.su-field>span{font-family:var(--f-dm);font-weight:700;font-size:14px;color:var(--fg)}
+.su-field input{width:100%;min-height:52px;padding:0 18px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);color:var(--fg);font-family:var(--f-dm);font-weight:600;font-size:16px}
+.su-field input::placeholder{color:rgba(189,177,204,.6)}
+.su-field input:focus{outline:none;border-color:#FF2D03;box-shadow:0 0 0 3px rgba(255,45,3,.25)}
+.su-field input[aria-invalid="true"]{border-color:#FF8A7A}
+.su-err{min-height:0;font-size:13px;font-weight:600;color:#FF8A7A}
+.su-err:empty{display:none}
+.su-note{margin:14px 0 0;font-size:13px;color:var(--muted)}
+.su-foot{width:100%;margin-top:auto;padding-top:24px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.su-cta{width:100%;justify-content:center;min-height:54px}
+.su-cta:disabled{opacity:.6}
+.su-switch{border:0;background:none;color:var(--fg);font-family:var(--f-dm);font-weight:700;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:4px}
+.su.is-login #su-name-wrap{display:none}
+.mini-agenda{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+.mini-agenda li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:9px 12px;font-weight:700;font-size:14px}
+.mini-agenda li:first-child{background:var(--fg);color:#12091C}
+.bat{position:absolute;color:rgba(255,255,255,.5);animation:flap 2.2s ease-in-out infinite}
+@keyframes flap{50%{transform:translateY(-6px) scaleX(.85)}}
+.bubble{position:absolute;top:24px;left:20px;right:100px;background:var(--fg);color:#12091C;border-radius:18px 18px 4px 18px;padding:10px 14px;font-weight:800;font-size:15px;z-index:1}
+.glow{position:relative;display:grid;place-items:center}
+.glow::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,177,153,.55),rgba(212,48,168,.25) 45%,transparent 70%);filter:blur(6px)}
+.glow svg{position:relative}
+
+/* ---------- topo: progresso do evento (fixo; ganha fundo ao rolar) — Figma 2045:10 / 2092:9973 ---------- */
+.view{flex:1;overflow-y:auto;overscroll-behavior:contain;position:relative}
+.trail{position:relative;min-height:100%;padding-bottom:110px;isolation:isolate}
+/* fundo fixo: fica fora da área que rola, então blobs e textura não se movem com o conteúdo */
+#main{background:#0B0613}
+#main .main-bg{z-index:0}
+#main .main-bg .veil{background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 100%)}
+#view-trilha{z-index:1}
+.trail-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.trail-bg .blob{position:absolute;border-radius:50%;filter:blur(70px)}
+.trail-bg .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 40%,rgba(11,6,19,.85) 100%)}
+.trail-bg .tex{position:absolute;left:-74px;top:-21px;bottom:0;width:512px;opacity:.28;mix-blend-mode:color-dodge;background:url("assets/textura-figma-3x.jpg") 0 0/512px 376px repeat-y}
+.top{position:sticky;top:0;z-index:5;display:flex;flex-direction:column;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 20px 16px;border-radius:0 0 28px 28px;border-bottom:1px solid transparent;transition:background-color .25s ease,border-color .25s ease}
+/* sem fundo no topo da página; fundo e desfoque só depois de rolar */
+.top.is-scrolled{background:rgba(26,15,38,.62);border-bottom-color:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px)}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 6px 6px 12px;font-family:var(--f-body);font-weight:800;font-size:16px;color:var(--fg)}
+.statusbar span{display:flex;gap:6px}
+.statusbar svg{width:18px;height:18px}
+@media (max-width:480px){.statusbar{display:none}.top{padding-top:16px}}
+.top-main{display:flex;flex-direction:column;gap:16px}
+.top-row{display:flex;align-items:center;gap:12px}
+.avatar{position:relative;width:52px;height:52px;flex:0 0 auto;padding:0;border-radius:26px;overflow:hidden;border:1px solid rgba(255,255,255,.28);background:#1B1128}
+.avatar img{position:absolute;left:-1px;top:-1px;width:52px;height:52px;max-width:none}
+.top-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;white-space:nowrap}
+.top-title h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:26px;line-height:1.15;color:var(--fg);font-variation-settings:"opsz" 14}
+.kicker{margin:0;font-family:var(--f-dm);font-weight:800;font-size:12px;line-height:16px;color:var(--muted);font-variation-settings:"opsz" 14}
+/* coluna da direita alinhada pela base: "x de y atividades" fica na mesma linha de "Esquenta Detach!" */
+.score{align-self:stretch;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2px;padding-bottom:2px;white-space:nowrap}
+.pct{font-family:var(--f-brico);font-weight:800;font-size:39.5px;line-height:28px;color:var(--fg);font-variant-numeric:tabular-nums;font-variation-settings:"opsz" 14}
+.pct span{font-weight:500;font-size:21.4px;line-height:1;color:var(--muted)}
+.score small{font-family:var(--f-dm);font-weight:500;font-size:10px;line-height:16px;color:var(--muted);font-variation-settings:"opsz" 14}
+.track{display:flex;align-items:flex-start;height:34px}
+.seg{flex:1;display:flex;align-items:center;min-width:0}
+.seg-bar{flex:1;min-width:1px;height:8px;margin-right:-14px;overflow:hidden;background:rgba(255,255,255,.14)}
+.seg + .seg .seg-bar{margin-left:-14px}
+.seg:first-child .seg-bar{border-radius:4px 0 0 4px}
+.seg-bar span{display:block;height:100%;background:linear-gradient(90deg,#FF2D03,#D430A8)}
+.node{position:relative;z-index:1;width:28px;height:28px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;background:#1B1128;border:1.5px solid rgba(255,255,255,.28);color:var(--muted)}
+.node svg{width:15px;height:15px}
+/* nós da barra são atalhos para a seção do momento; área de toque ampliada para 44px */
+button.node{padding:0;cursor:pointer;font:inherit}
+button.node::before{content:"";position:absolute;inset:-8px;border-radius:50%}
+button.node:active{transform:scale(.92)}
+button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.node.past{background:#FF2D03;border-color:rgba(255,255,255,.24);color:#fff}
+.node.now{border-color:#FF2D03;color:var(--fg)}
+/* progresso pessoal: anel laranja que fecha conforme as atividades do momento; completo = nó laranja */
+.node.complete{background:#FF2D03;border-color:rgba(255,255,255,.24);color:#fff}
+.node.complete.now{border-color:#FF2D03}
+.node-ring{position:absolute;inset:-3px;width:32px!important;height:32px!important;transform:rotate(-90deg);pointer-events:none}
+.node-ring circle{fill:none;stroke:#FF2D03;stroke-width:2.5;stroke-linecap:round}
+/* "ao vivo": anel que se expande e some, em loop */
+.node.now::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border:2px solid #FF2D03;animation:live-ring 1.8s cubic-bezier(.2,.6,.4,1) infinite;pointer-events:none}
+@keyframes live-ring{0%{transform:scale(1);opacity:.85}80%,100%{transform:scale(1.75);opacity:0}}
+/* mesmo anel, mesmo ritmo, na bolinha das pílulas — todos começam juntos ao renderizar a tela */
+.chip-agora{position:relative}
+.chip-agora::after{content:"";position:absolute;left:9.5px;top:calc(50% - 5px);width:10px;height:10px;box-sizing:border-box;border-radius:50%;border:2px solid #FF2D03;animation:live-ring 1.8s cubic-bezier(.2,.6,.4,1) infinite;pointer-events:none}
+
+/* ---------- conteúdo ---------- */
+.content{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+
+/* ---------- Card "agora" — Figma 2047:8510 ---------- */
+.now-card{position:relative;isolation:isolate;overflow:hidden;height:274px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:6px 26px 21px 16px;border-radius:32px;background:linear-gradient(158.39deg,#05030A 13.393%,#100820 42.875%,#5808C0 61.643%);box-shadow:0 24px 50px -22px rgba(135,64,233,.55);color:#fff}
+.nc-deco{position:absolute;z-index:-1;pointer-events:none;max-width:none}
+/* borda de 6px desenhada por cima, como no Figma: o brilho e a teia passam por baixo dela */
+.now-card::after{content:"";position:absolute;inset:0;border:6px solid rgba(0,0,0,.14);border-radius:inherit;pointer-events:none}
+.nc-glow{left:0;top:0;width:100%;height:100%}
+/* ordem do Figma: brilho → textura (color dodge) → teia → conteúdo */
+.nc-tex{left:-27px;top:-21px;width:calc(100% + 65.6px);height:307.2px;mix-blend-mode:color-dodge;background:url("assets/textura-figma-3x.jpg") center/cover}
+.nc-web{right:0;bottom:0;width:218px;height:208px}
+.nc-info{flex:1;min-height:0;display:flex;flex-direction:column;padding-top:8px}
+.nc-row{display:flex;justify-content:space-between;align-items:flex-start}
+.now-icon{width:52px;height:52px;flex:0 0 auto;display:grid;place-items:center;border-radius:26px;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle 26px at 65% 70%,#2A1A44 0%,#1E1232 50%,#120A20 100%);box-shadow:0 10px 24px -8px rgba(0,0,0,.8);color:#fff}
+.now-icon svg{width:22px;height:22px}
+.nc-chips{display:flex;gap:8px;align-items:center;margin-top:6px}
+.chip-agora{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:rgba(247,242,251,.12);font-family:var(--f-dm);font-weight:800;font-size:12px;line-height:normal;color:#fff;white-space:nowrap;font-variation-settings:"opsz" 14}
+.chip-agora::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF2D03}
+.chip-time{display:inline-flex;padding:3px 8px;border-radius:1000px;background:rgba(255,255,255,.12);font-family:var(--f-dm);font-weight:700;font-size:12px;line-height:normal;color:#fff;white-space:nowrap;font-variation-settings:"opsz" 14}
+.nc-title{margin:12px 0 0;width:270px;max-width:100%;font-family:var(--f-brico);font-weight:800;font-size:24px;line-height:1.2;font-variation-settings:"opsz" 14}
+.nc-sub{margin:4px 0 6px;font-family:var(--f-dm);font-weight:600;font-size:12px;color:#fff;font-variation-settings:"opsz" 14}
+.now-card .btn-dark{align-self:flex-start;width:auto;min-height:0;height:48px;padding:0 22px;font-size:15px;background:#0B0613;color:#fff;border:1px solid rgba(255,255,255,.14)}
+.now-card .btn-dark svg{width:18px;height:18px}
+
+/* ---------- lista de momentos — Figma 2046:2 ---------- */
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;white-space:nowrap}
+.sec-head h2{margin:0;font-family:var(--f-brico);font-weight:800;font-size:18px;color:var(--fg);font-variation-settings:"opsz" 14}
+.sec-head span{font-family:var(--f-dm);font-weight:600;font-size:14px;color:#fff;font-variant-numeric:tabular-nums;font-variation-settings:"opsz" 14}
+.stages{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.stage-card{display:flex;flex-direction:column;padding:16px;border-radius:26px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px)}
+.stage-card.is-locked,.stage-card.is-open{background:rgba(26,15,38,.62)}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.chip-line{display:inline-flex;padding:3px 8px;border-radius:1000px;border:1px solid rgba(255,255,255,.15);font-family:var(--f-dm);font-weight:700;font-size:12px;line-height:normal;color:#fff;white-space:nowrap;font-variation-settings:"opsz" 14}
+.chip-wait{border-style:dashed;border-color:#575060;color:var(--muted)}
+.chip-done{border-color:transparent;background:rgba(255,45,3,.18);color:#FFB199}
+.stage-card h3{margin:0;font-family:var(--f-brico);font-weight:800;font-size:18px;line-height:1.3;color:var(--fg);text-wrap:balance;font-variation-settings:"opsz" 14}
+.stage-card .who{margin:4px 0 0;font-family:var(--f-body);font-weight:700;font-size:13px;color:var(--muted)}
+.acts{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.act{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:12px 14px;min-height:60px;color:var(--fg)}
+.act:hover:not(:disabled){background:rgba(255,255,255,.09)}
+.act .check{width:28px;height:28px;flex:0 0 auto;border-radius:14px;border:2px solid rgba(255,255,255,.28);display:grid;place-items:center}
+.act .check svg{width:16px;height:16px}
+.act.is-done .check{background:#FF2D03;border:0;color:#fff}
+.act:disabled{background:transparent;border-style:dashed;cursor:not-allowed}
+.act:disabled .check svg{width:14px;height:14px;color:var(--dim)}
+.act-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.act-title{font-family:var(--f-body);font-weight:800;font-size:15px;line-height:1.25}
+.act-meta{font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted)}
+.act:disabled .act-title{color:var(--dim)}
+.act .chev{display:flex;color:var(--dim)}
+.act .chev svg{width:18px;height:18px}
+
+.demo{margin:20px 20px 0;border:1px dashed var(--line-strong);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;background:rgba(11,6,19,.5)}
+.demo-label{margin:0;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.demo label{font-size:13px;font-weight:800}
+.demo select{min-height:44px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface-strong);padding:0 10px}
+.demo-check{display:flex;align-items:center;gap:10px;min-height:44px}
+.demo-check input{width:20px;height:20px;accent-color:var(--orange)}
+.demo-links{display:flex;gap:16px;flex-wrap:wrap}
+.demo-links button{border:0;background:none;padding:6px 0;font-size:13px;font-weight:800;text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
+
+/* ---------- tab bar flutuante — Figma 2046:133 (250 × 64) ---------- */
+.tabbar{position:absolute;left:50%;transform:translateX(-50%);transform-origin:50% 100%;transition:transform .25s cubic-bezier(.2,.8,.2,1);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:6;width:250px;height:64px;display:flex;align-items:center;justify-content:center;padding:0 16px;border-radius:58px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px)}
+.tab{flex:1;min-width:0;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;border-radius:24px;font-family:var(--f-body);font-size:12px;font-weight:700;color:rgba(189,177,204,.8)}
+.tab svg{width:24px;height:24px}
+.tab{position:relative}
+.tab.has-new::after{content:"";position:absolute;top:7px;left:calc(50% + 7px);width:10px;height:10px;border-radius:50%;background:#FF2D03;box-shadow:0 0 10px rgba(255,45,3,.75)}
+.tab[aria-current="page"]{color:#fff;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))}
+/* o ícone route ocupa a caixa inteira e parece maior que o ghost; reduz sem mexer no alinhamento do texto */
+.tab[data-tab="trilha"] svg{transform:scale(.85)}
+.fab-wrap{display:flex;padding:0 18px}
+.fab{width:52px;height:52px;border-radius:26px;border:0;background:#FF2D03;color:#fff;display:grid;place-items:center;box-shadow:0 8px 20px -6px rgba(255,45,3,.6);transition:transform .15s ease}
+.fab:active{transform:scale(.94)}
+.fab svg{width:24px;height:24px}
+.tabbar.is-compact{transform:translateX(-50%) scale(.86)}
+
+/* ---------- quiz ---------- */
+.quiz{display:flex;flex-direction:column;gap:12px}
+.quiz-item{border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(255,255,255,.04)}
+.quiz-q{margin:0 0 10px;font-weight:800}
+.quiz-btns{display:flex;gap:8px}
+.quiz-btns .pill{flex:1}
+.quiz-btns .pill:disabled[aria-pressed="true"]{opacity:1}
+.quiz-fb{margin:10px 0 0;font-size:13px;color:var(--muted)}
+.quiz-fb b{color:var(--fg)}
+.quiz-fb.ok b{color:var(--success)}
+.quiz-fb.no b{color:#FFB199}
+
+/* ---------- Fuxo: personalização (wireframe Figma 2122:2969, componentes da tela Trilha) ---------- */
+.fx{z-index:25;background:#0B0613;isolation:isolate;overflow:hidden}
+.fx .statusbar{position:relative;z-index:1;padding-left:32px;padding-right:26px}
+.fx-top{position:relative;z-index:1;display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px}
+.fx-top h1{flex:1;margin:0;text-align:center;font-family:var(--f-brico);font-weight:800;font-size:20px;line-height:1.2;font-variation-settings:"opsz" 14}
+.fx-back{width:44px;height:44px;flex:0 0 auto;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--fg);display:grid;place-items:center}
+.fx-back svg{width:22px;height:22px}
+.fx-actions{display:flex;gap:8px;flex:0 0 auto}
+/* o grupo da direita tem 2 botões; o espaço extra à esquerda mantém o título centralizado */
+.fx-top::before{content:"";width:52px;flex:0 0 auto;order:1}
+.fx-top .fx-back{order:0}.fx-top h1{order:2}.fx-top .fx-actions{order:3}
+.fx-icon-btn{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--fg);display:grid;place-items:center}
+.fx-icon-btn svg{width:20px;height:20px}
+.fx-ok-btn{border:0;background:#FF2D03;color:#fff;box-shadow:0 8px 20px -8px rgba(255,45,3,.7)}
+.fx-ok-btn svg{width:22px;height:22px}
+.fx-icon-btn:active,.fx-back:active{transform:scale(.94)}
+/* palco claro: as peças do Figma têm detalhes azul-marinho (bocas, botas, garras) que somem num fundo escuro */
+.fx-stage{position:relative;z-index:1;flex:0 0 auto;margin:0 20px;height:clamp(200px,31vh,270px);border-radius:28px;overflow:hidden;background:radial-gradient(70% 60% at 50% 42%,#FFFFFF 0%,#F1ECFD 55%,#E2D8FA 100%);border:1px solid rgba(255,255,255,.4)}
+.fx-stage canvas{position:relative;z-index:1;display:block;width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(29,32,72,.16))}
+.fx-cats{position:relative;z-index:1;flex:0 0 auto;display:flex;justify-content:space-between;gap:4px;padding:16px 16px 6px}
+.fx-cat{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--muted);font-size:11px;font-weight:700}
+.fx-cat .ic{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.07);border:1px solid var(--line);transition:background .15s,border-color .15s}
+.fx-cat .ic svg{width:22px;height:22px}
+.fx-cat[aria-selected="true"]{color:#fff}
+.fx-cat[aria-selected="true"] .ic{background:#FF2D03;border-color:#FF2D03;box-shadow:0 8px 18px -8px rgba(255,45,3,.7)}
+.fx-cat .lk{position:absolute;top:-5px;left:calc(50% + 13px);width:20px;height:20px;border-radius:10px;background:#1B1128;border:1px solid var(--line-strong);display:grid;place-items:center;color:var(--fg)}
+.fx-cat .lk svg{width:11px;height:11px}
+.fx-panel{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;padding:0 20px calc(28px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
+.fx-panel::-webkit-scrollbar{display:none}
+.fx-h{margin:20px 0 10px;font-family:var(--f-brico);font-weight:800;font-size:17px;line-height:1.2;font-variation-settings:"opsz" 14}
+.fx-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.fx-seg button{flex:1;min-width:0;min-height:38px;border:0;border-radius:999px;background:none;color:var(--muted);font-weight:800;font-size:13px;white-space:nowrap}
+.fx-seg button[aria-checked="true"]{background:#FF2D03;color:#fff}
+.fx-gap{height:14px}
+.fx-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px}
+.fx-grid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fx-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:0;background:none;padding:0;color:var(--muted);font-size:12px;font-weight:700;line-height:1.25;text-align:center}
+.fx-tile>span:last-child:not(.fx-well){max-width:100%;overflow-wrap:anywhere}
+.fx-well{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:18px;background:#EEE8FB;transition:box-shadow .15s,opacity .15s}
+.fx-well canvas{width:88%;height:88%}
+.fx-none{color:#8E829F}
+.fx-none svg{width:28px;height:28px}
+.fx-tile[aria-checked="true"]{color:var(--fg)}
+.fx-tile[aria-checked="true"] .fx-well{box-shadow:0 0 0 2.5px #FF2D03,0 0 0 6px rgba(255,45,3,.22)}
+.fx-ok{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:11px;background:#FF2D03;color:#fff;display:grid;place-items:center;box-shadow:0 0 0 2px #0B0613}
+.fx-ok svg{width:13px;height:13px}
+.fx-tile[aria-disabled="true"] .fx-well{opacity:.35}
+.fx-tile:focus-visible,.fx-cat:focus-visible,.fx-chip:focus-visible,.fx-seg button:focus-visible,.fx-sw button:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:18px}
+.fx-sw{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px 8px}
+.fx-sw button{display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;padding:0;color:var(--muted);font-size:12px;font-weight:700}
+.fx-sw .dot{width:46px;height:46px;border-radius:50%;box-shadow:inset 0 -6px 10px rgba(0,0,0,.18),inset 0 5px 8px rgba(255,255,255,.3),0 0 0 1px rgba(255,255,255,.18)}
+.fx-sw button[aria-checked="true"]{color:var(--fg)}
+.fx-sw button[aria-checked="true"] .dot{box-shadow:inset 0 -6px 10px rgba(0,0,0,.18),inset 0 5px 8px rgba(255,255,255,.3),0 0 0 3px #0B0613,0 0 0 5.5px #FF2D03}
+.fx-chips{display:flex;gap:8px;overflow-x:auto;margin:14px -20px 0;padding:2px 20px;scrollbar-width:none}
+.fx-chips::-webkit-scrollbar{display:none}
+.fx-chip{flex:0 0 auto;display:flex;align-items:center;gap:6px;min-height:38px;padding:0 15px;border-radius:999px;border:1px solid var(--line-strong);background:none;color:var(--muted);font-weight:800;font-size:13px}
+.fx-chip svg{width:13px;height:13px}
+.fx-chip .on{width:6px;height:6px;border-radius:3px;background:#FF2D03}
+.fx-new{padding:2px 6px;border-radius:999px;background:#FF2D03;color:#fff;font-size:10px;font-weight:800;line-height:1.3;letter-spacing:.03em;text-transform:uppercase}
+.fx-chip[aria-selected="true"] .fx-new{background:#fff;color:#FF2D03}
+.fx-cat .nw{position:absolute;top:-3px;left:calc(50% + 14px);width:12px;height:12px;border-radius:50%;background:#FF2D03;box-shadow:0 0 10px rgba(255,45,3,.7)}
+.fx-chip[aria-selected="true"]{background:#FF2D03;border-color:#FF2D03;color:#fff}
+.fx-chip[aria-selected="true"] .on{background:#fff}
+.fx-lock{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.fx-lock-ic{flex:0 0 auto;width:36px;height:36px;border-radius:18px;display:grid;place-items:center;background:rgba(255,45,3,.16);color:#FF8A6A}
+.fx-lock-ic svg{width:17px;height:17px}
+.fx-lock p{margin:0;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.fx-lock b{font-weight:800;color:var(--fg)}
+.fx-lock span{color:var(--muted)}
+.avatar canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .2s}
+.avatar.has-fx canvas{opacity:1}
+.avatar.has-fx img{opacity:0}
+
+/* ---------- recompensa de momento concluído (overlay com blur) ---------- */
+.rw{position:absolute;inset:0;z-index:45;display:flex;flex-direction:column;background:rgba(14,8,40,.55);-webkit-backdrop-filter:blur(16px) saturate(130%);backdrop-filter:blur(16px) saturate(130%);animation:rw-fade .35s ease both;overflow:hidden}
+.rw.out{animation:rw-fade .3s ease reverse both}
+@keyframes rw-fade{from{opacity:0}to{opacity:1}}
+/* luzes desfocadas ao fundo (bokeh rosa e roxo) */
+.rw-bokeh{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.rw-bokeh i{position:absolute;border-radius:50%;filter:blur(22px);opacity:.55;animation:rw-drift 7s ease-in-out infinite alternate}
+.rw-bokeh i:nth-child(1){left:-60px;top:12%;width:220px;height:220px;background:#D430A8}
+.rw-bokeh i:nth-child(2){right:-70px;top:32%;width:240px;height:240px;background:#8740E9;animation-delay:-2s}
+.rw-bokeh i:nth-child(3){left:20%;bottom:6%;width:200px;height:200px;background:#5B3BE8;animation-delay:-4s}
+.rw-bokeh i:nth-child(4){right:12%;top:-50px;width:160px;height:160px;background:#FF4B27;opacity:.3;animation-delay:-1s}
+@keyframes rw-drift{to{transform:translate(18px,-22px) scale(1.12)}}
+.rw-body{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 28px 0;text-align:center}
+.rw-eyebrow{margin:0 0 8px;font-family:var(--f-dm);font-weight:600;font-size:14px;line-height:1.3;color:#fff;font-variation-settings:"opsz" 14}
+.rw-stage{position:relative;width:300px;height:250px;margin:6px 0 2px}
+.rw .rw-stage>*{position:absolute;left:50%;top:50%;translate:-50% -50%;pointer-events:none}
+/* intro: símbolo de componente (❖) carrega energia e explode em raios */
+.rw-speed{width:520px;height:520px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.16) 0 2.5deg,rgba(255,255,255,0) 2.5deg 15deg);-webkit-mask:radial-gradient(circle,transparent 16%,#000 30%,transparent 62%);mask:radial-gradient(circle,transparent 16%,#000 30%,transparent 62%);opacity:0}
+.rw-halo{width:220px;height:220px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(184,140,255,.35) 40%,rgba(135,64,233,0));opacity:0}
+.rw-sym{width:124px;height:124px;opacity:0;filter:drop-shadow(0 0 18px rgba(190,150,255,.75))}
+.rw-burst{width:620px;height:620px;border-radius:50%;background:repeating-conic-gradient(from 6deg,rgba(255,255,255,.95) 0 4deg,rgba(255,255,255,0) 4deg 22deg);-webkit-mask:radial-gradient(circle,#000 6%,transparent 60%);mask:radial-gradient(circle,#000 6%,transparent 60%);opacity:0}
+.rw-flash{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#fff 0 35%,rgba(255,255,255,0) 70%);opacity:0}
+/* revelação: ilustração no centro; enfeites só no anel ao redor (z abaixo do desenho) */
+.rw-card{z-index:2;width:200px;height:170px;opacity:0}
+.rw-ill{width:100%;height:100%;object-fit:contain;overflow:visible;filter:drop-shadow(0 14px 22px rgba(0,0,0,.35))}
+.rw-orn{z-index:1;opacity:0}
+.rw-orn.star{width:var(--s);height:var(--s);fill:var(--c)}
+.rw-orn.dot{width:var(--s);height:var(--s);border-radius:50%;background:var(--c)}
+.rw-conf{z-index:0;width:8px;height:14px;border-radius:2px;opacity:0}
+.rw h2{margin:14px 0 6px;font-family:var(--f-brico);font-weight:800;font-size:24px;line-height:1.2;color:var(--fg);text-wrap:balance;font-variation-settings:"opsz" 14}
+.rw-text{margin:0;max-width:300px;text-wrap:balance;font-family:var(--f-dm);font-weight:600;font-size:14px;line-height:1.45;color:var(--muted);font-variation-settings:"opsz" 14}
+.rw-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.rw-chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--line-strong);color:var(--fg);font-weight:800;font-size:14px}
+.rw-chip b{display:grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#FF2D03;color:#fff;font-size:12px}
+.rw-dots{display:flex;gap:6px;margin-top:18px;min-height:6px}
+.rw-dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.3);transition:width .25s,background .25s}
+.rw-dots i.on{width:18px;background:#FF2D03}
+.rw-foot{position:relative;padding:12px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.rw-foot button{width:100%;min-height:54px;border:0;border-radius:999px;background:#FF2D03;color:#fff;font-weight:800;font-size:16px;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
+.rw-foot button:active{transform:scale(.98)}
+.rw-foot .rw-ghost{margin-top:8px;min-height:48px;background:none;box-shadow:none;color:var(--fg);font-weight:800;font-size:15px}
+.rw-foot button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* sequência (≈2,5 s): ❖ surge com brilhinhos → linhas de velocidade + pulsos (carga) → explode em raios + flash → ilustração */
+.rw-body.play .rw-speed{animation:rw-speed 2.1s linear both}
+.rw-body.play .rw-halo{animation:rw-halo 2.05s ease both}
+.rw-body.play .rw-sym{animation:rw-sym 2.05s cubic-bezier(.3,.8,.3,1) both}
+.rw-body.play .rw-orn.pre{animation:rw-orn-pre 1.9s ease-out calc(.15s + var(--t)) both}
+.rw-body.play .rw-burst{animation:rw-burst .9s cubic-bezier(.2,.7,.3,1) 1.95s both}
+.rw-body.play .rw-flash{animation:rw-flash .6s ease-out 1.95s both}
+.rw-body.play .rw-card{animation:rw-card .6s cubic-bezier(.3,1.6,.45,1) 2.15s both}
+.rw-body.play .rw-conf{animation:rw-conf 1.1s cubic-bezier(.15,.7,.3,1) 2.05s both}
+.rw-body.play .rw-orn.post{animation:rw-orn-in .45s cubic-bezier(.3,1.6,.45,1) calc(2.3s + var(--t)) both,rw-tw var(--d,1.8s) ease-in-out calc(2.8s + var(--t)) infinite}
+.rw-body.play .rw-eyebrow{animation:rw-up .5s ease .2s both}
+.rw-body.play h2{animation:rw-up .5s cubic-bezier(.2,.8,.2,1) 2.35s both}
+.rw-body.play .rw-text{animation:rw-up .5s cubic-bezier(.2,.8,.2,1) 2.45s both}
+.rw-body.play .rw-dots{animation:rw-up .5s ease 2.5s both}
+@keyframes rw-speed{0%{opacity:0;transform:rotate(0)}15%{opacity:1}88%{opacity:1}100%{opacity:0;transform:rotate(120deg)}}
+@keyframes rw-halo{0%{opacity:0;transform:scale(.4)}25%{opacity:.8;transform:scale(1)}85%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.6)}}
+@keyframes rw-sym{0%{opacity:0;transform:scale(.2) rotate(-90deg)}18%{opacity:1;transform:scale(1.08) rotate(6deg)}26%{transform:scale(1) rotate(0)}
+  40%{transform:scale(1) rotate(0)}42%{transform:scale(1.12) rotate(-5deg)}44%{transform:scale(1.12) rotate(5deg)}46%{transform:scale(1) rotate(0)}
+  64%{transform:scale(1.05) rotate(0)}66%{transform:scale(1.22) rotate(6deg)}68%{transform:scale(1.22) rotate(-6deg)}70%{transform:scale(1.1) rotate(0)}
+  88%{opacity:1;transform:scale(.86)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes rw-orn-pre{0%{opacity:0;transform:translate(0,0) scale(.3)}25%{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}60%{opacity:.5;transform:translate(var(--x),var(--y)) scale(.7) rotate(45deg)}85%{opacity:1;transform:translate(var(--x),var(--y)) scale(1) rotate(90deg)}100%{opacity:0;transform:translate(calc(var(--x)*1.6),calc(var(--y)*1.6)) scale(.4)}}
+@keyframes rw-burst{0%{opacity:0;transform:scale(.2) rotate(0)}25%{opacity:1}100%{opacity:0;transform:scale(1.15) rotate(25deg)}}
+@keyframes rw-flash{0%{opacity:0;transform:scale(.5)}25%{opacity:1}100%{opacity:0;transform:scale(8)}}
+@keyframes rw-card{0%{opacity:0;transform:scale(.3) rotate(-12deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes rw-conf{0%{opacity:0;transform:rotate(var(--a)) translateY(0) rotate(0)}15%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--d) * -1)) rotate(var(--r))}}
+@keyframes rw-orn-in{0%{opacity:0;transform:translate(calc(var(--x)*.6),calc(var(--y)*.6)) scale(0)}100%{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}}
+@keyframes rw-tw{0%,100%{transform:translate(var(--x),var(--y)) scale(1) rotate(0);opacity:1}50%{transform:translate(var(--x),var(--y)) scale(.55) rotate(45deg);opacity:.55}}
+@keyframes rw-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* transição entre ganhos: estrela de 4 pontas cresce até cobrir a tela e encolhe revelando o próximo */
+.rw-wipe{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.85) 0,rgba(196,170,255,.55) 22%,rgba(106,60,240,.35) 45%,rgba(20,10,50,0) 75%)}
+.rw.wipe-in .rw-wipe{animation:rw-wipe-in .45s ease-in both}
+.rw.wipe-out .rw-wipe{animation:rw-wipe-out .5s ease-out both}
+.rw.wipe-in .rw-body{transition:opacity .3s;opacity:0}
+@keyframes rw-wipe-in{from{opacity:0}to{opacity:1}}
+@keyframes rw-wipe-out{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.rw-body.play *{animation:none!important}.rw-speed,.rw-halo,.rw-sym,.rw-burst,.rw-flash,.rw-conf,.rw-orn.pre{display:none}.rw-card{opacity:1}.rw-orn.post{opacity:1;transform:translate(var(--x),var(--y))}}
+/* ---------- poção: caldeirão (≈3 s) → explode → pote + cupom. Mesmo motion da conquista, sem o símbolo ---------- */
+.pot .rw-card{width:170px;height:206px}
+.pot-stage{height:270px}
+.pot-cauldron{width:220px;height:220px;margin-top:12px;opacity:0;z-index:1}
+.pot-word{z-index:4;padding:7px 14px;border-radius:999px;background:#FF2D03;color:#fff;font-weight:800;font-size:14px;white-space:nowrap;box-shadow:0 6px 16px -6px rgba(0,0,0,.5);opacity:0}
+.pot-splash{z-index:2;width:120px;height:40px;margin-top:-6px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,229,138,.95),rgba(255,181,46,.5) 55%,rgba(255,122,26,0));opacity:0}
+.pot-bub{z-index:2;width:12px;height:12px;border-radius:50%;margin-top:-4px;margin-left:var(--bx);background:#FFE58A;box-shadow:0 0 8px rgba(255,200,80,.8);opacity:0}
+.pot-body.brew .rw-speed{animation:rw-speed 3.1s linear both}
+.pot-body.brew .rw-halo{animation:rw-halo 3.05s ease both}
+.pot-body.brew .rw-orn.pre{animation:rw-orn-pre 2.8s ease-out calc(.4s + var(--t)) both}
+.pot-body.brew .pot-cauldron{animation:pot-in .5s cubic-bezier(.3,1.5,.5,1) both,pot-shake .7s ease-in-out 2.2s both,pot-out .3s ease-in 2.95s forwards}
+.pot-body.brew .pot-word{animation:pot-word .8s cubic-bezier(.45,0,.55,1) var(--wt) both}
+.pot-body.brew .pot-splash{animation:pot-splash .42s ease-out 1.42s 3 both}
+.pot-body.brew .pot-bub{animation:pot-bub .9s ease-out var(--bt) 2 both}
+.pot-body.brew .rw-burst{animation:rw-burst .9s cubic-bezier(.2,.7,.3,1) 2.95s both}
+.pot-body.brew .rw-flash{animation:rw-flash .6s ease-out 2.95s both}
+.pot-body.brew .rw-card{animation:rw-card .6s cubic-bezier(.3,1.6,.45,1) 3.15s both}
+.pot-body.brew .rw-conf{animation:rw-conf 1.1s cubic-bezier(.15,.7,.3,1) 3.05s both}
+.pot-body.brew .rw-orn.post{animation:rw-orn-in .45s cubic-bezier(.3,1.6,.45,1) calc(3.3s + var(--t)) both,rw-tw var(--d,1.8s) ease-in-out calc(3.8s + var(--t)) infinite}
+.pot-body.brew .rw-eyebrow{animation:rw-up .5s ease .2s both}
+.pot-body.brew h2{animation:rw-up .5s cubic-bezier(.2,.8,.2,1) 3.35s both}
+.pot-body.brew .rw-text{animation:rw-up .5s cubic-bezier(.2,.8,.2,1) 3.45s both}
+.pot-body.brew .pot-coupon-wrap{animation:rw-up .5s cubic-bezier(.2,.8,.2,1) 3.55s both}
+@keyframes pot-in{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+@keyframes pot-out{to{opacity:0;transform:scale(1.25)}}
+@keyframes pot-shake{0%,100%{transform:none}15%{transform:rotate(-4deg) scale(1.03)}30%{transform:rotate(4deg) scale(1.05)}45%{transform:rotate(-5deg) scale(1.06)}60%{transform:rotate(5deg) scale(1.08)}80%{transform:rotate(-2deg) scale(1.1)}}
+@keyframes pot-word{0%{opacity:0;transform:translate(var(--x0),calc(var(--y0) + 16px)) scale(.6)}18%{opacity:1;transform:translate(var(--x0),var(--y0)) scale(1)}45%{transform:translate(calc(var(--x0) * .55),calc(var(--y0) - 26px)) scale(1) rotate(-6deg)}85%{opacity:1;transform:translate(0,4px) scale(.45) rotate(8deg)}100%{opacity:0;transform:translate(0,20px) scale(.2)}}
+@keyframes pot-splash{0%{opacity:0;transform:scale(.5)}35%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1.4)}}
+@keyframes pot-bub{0%{opacity:0;transform:translateY(0) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translateY(-70px) scale(1.1)}}
+.pot-coupon-wrap{width:100%;display:flex;justify-content:center;margin-top:16px}
+.pot-coupon{width:100%;max-width:320px;display:flex;flex-direction:column;gap:8px;padding:12px 12px 12px 16px;border-radius:20px;border:1.5px dashed rgba(255,255,255,.35);background:rgba(0,0,0,.31);text-align:left}
+.sheet .pot-coupon{max-width:none;margin-top:16px}
+.pot-coupon-l{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.02em}
+.pot-coupon-row{display:flex;align-items:center;gap:10px}
+.pot-code{flex:1;min-width:0;font-family:var(--f-brico);font-weight:800;font-size:17px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;user-select:all;-webkit-user-select:all}
+.pot-copy{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border:0;border-radius:999px;background:#fff;color:#12091C;font-weight:800;font-size:14px}
+.pot-copy svg{width:16px;height:16px}
+.pot-copy.ok{background:var(--success);color:#0B2A1C}
+.pot-copy:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.pot-body.brew *{animation:none!important}.pot .rw-speed,.pot .rw-halo,.pot-cauldron,.pot-word,.pot-splash,.pot-bub,.pot .rw-burst,.pot .rw-flash,.pot .rw-conf,.pot .rw-orn.pre{display:none}.pot .rw-card{opacity:1}.pot .rw-orn.post{opacity:1;transform:translate(var(--x),var(--y))}}
+
+/* ---------- editor do mascote (anatomia do Memoji) ---------- */
+.editor{background:radial-gradient(120% 60% at 50% 0%,#3A1640 0%,#160C24 55%,#0B0613 100%);z-index:25}
+.ed-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0}
+.ed-top .btn-icon{background:rgba(255,255,255,.12);border:1px solid var(--line)}
+.ed-top .btn-icon.ok{background:var(--fg);color:#12091C}
+.ed-preview{display:grid;place-items:center;padding-top:4px;flex:0 0 auto}
+.ed-hint{margin:0;text-align:center;font-size:13px;color:var(--dim);min-height:20px}
+.ed-hint.warn{color:#FFB199;font-weight:700}
+.ed-tabs{display:flex;gap:26px;overflow-x:auto;padding:12px 20px 12px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.ed-tabs::-webkit-scrollbar{display:none}
+.ed-tab{border:0;background:none;padding:6px 0;font-size:17px;font-weight:800;color:var(--muted);white-space:nowrap}
+.ed-tab[aria-selected="true"]{color:#FF8A6A}
+.ed-panel{flex:1;overflow-y:auto;background:rgba(20,11,32,.72)}
+.ed-row{display:flex;gap:12px;overflow-x:auto;padding:16px 20px;scroll-snap-type:x proximity;scrollbar-width:none}
+.ed-row::-webkit-scrollbar{display:none}
+.tile{flex:0 0 108px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px 10px;border-radius:24px;border:3px solid transparent;background:rgba(255,255,255,.05);scroll-snap-align:start;position:relative;font-size:12px;font-weight:800;color:var(--muted)}
+.tile[aria-pressed="true"]{border-color:rgba(255,255,255,.75);color:var(--fg);background:rgba(255,255,255,.08)}
+.tile[aria-disabled="true"] svg.mascot{opacity:.3;filter:grayscale(1)}
+.tile .lock{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:#12091C;display:grid;place-items:center;color:var(--fg)}
+.tile .lock svg{width:12px;height:12px}
+.ed-sub{border-top:1px solid var(--line);padding:16px 20px 24px}
+.ed-sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ed-sub-head h3{margin:0;font-size:17px;font-weight:800}
+.ed-sub-head span{font-size:14px;font-weight:800;color:var(--success)}
+.swatches{display:flex;gap:16px;overflow-x:auto;padding:9px 9px 10px;margin:0 -9px;scrollbar-width:none}
+.swatches::-webkit-scrollbar{display:none}
+.sw{flex:0 0 auto;width:60px;height:60px;border-radius:50%;border:0;padding:0;position:relative;box-shadow:inset 0 -8px 14px rgba(0,0,0,.22),inset 0 6px 10px rgba(255,255,255,.35)}
+.sw[aria-pressed="true"]{outline:3px solid rgba(255,255,255,.8);outline-offset:5px}
+.sw[aria-disabled="true"]{opacity:.35}
+.sw .lock{position:absolute;inset:0;display:grid;place-items:center;color:#12091C}
+.sw .lock svg{width:18px;height:18px}
+.discard{position:absolute;left:16px;right:16px;bottom:16px;z-index:3;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--surface-strong)}
+.discard p{margin:0 0 4px;font-weight:800;text-align:center}
+
+/* ---------- Drawer de atividade ---------- */
+.scrim{position:absolute;inset:0;background:rgba(5,2,10,.38);z-index:20;animation:sc-in .3s ease both}
+.scrim.out{animation:sc-out .26s ease both}
+@keyframes sc-in{from{opacity:0}to{opacity:1}}
+@keyframes sc-out{from{opacity:1}to{opacity:0}}
+/* gaveta no mesmo vidro dos cards da trilha (preto translúcido + desfoque); desfoque maior porque fica por cima de texto */
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88%;background:rgba(8,4,14,.5);-webkit-backdrop-filter:blur(26px) saturate(150%);backdrop-filter:blur(26px) saturate(150%);border:1px solid rgba(255,255,255,.12);border-bottom:0;border-radius:30px 30px 0 0;z-index:21;display:flex;flex-direction:column;animation:sheet-in .38s cubic-bezier(.2,.85,.25,1) both}
+/* gaveta: sobe de baixo ao abrir (desacelerando) e desce ao fechar (acelerando, mais rápida) */
+.sheet.out{animation:sheet-out .26s cubic-bezier(.4,0,.8,.4) both}
+@keyframes sheet-in{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheet-out{from{transform:none}to{transform:translateY(100%)}}
+@keyframes up{from{transform:translateY(40px);opacity:.3}to{transform:none;opacity:1}}
+.grabber{width:42px;height:5px;border-radius:3px;background:var(--line-strong);margin:10px auto 0}
+.sheet-close{position:absolute;right:12px;top:10px;background:rgba(0,0,0,.31);border:1px solid rgba(255,255,255,.12)}
+/* ação principal laranja, como o Continuar da conquista e o botão da câmera */
+#sheet-cta:not(:disabled){background:#FF2D03;color:#fff;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
+.sheet-scroll{overflow-y:auto;padding:12px 20px 8px}
+.sheet-eyebrow{margin:0;display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800;color:var(--muted)}
+.sheet h2{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.2;margin:10px 48px 8px 0;text-wrap:balance}
+.sheet-desc{margin:0 0 18px;color:var(--muted)}
+.sheet-desc:has(+ .sheet-note){margin-bottom:10px}
+.sheet-note{margin:0 0 18px;padding:2px 0 2px 10px;border-left:2px solid var(--orange);font-size:13px;line-height:1.4;color:var(--muted)}
+.sheet-note b{color:var(--fg);font-weight:800}
+.sheet-foot{padding:12px 20px calc(18px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 16px;border:0;padding:0}
+.field>span,.field legend{font-size:14px;font-weight:800;padding:0;margin-bottom:6px}
+.field input,.field textarea{width:100%;border:1px solid var(--line-strong);border-radius:16px;background:rgba(255,255,255,.05);padding:13px 16px;min-height:50px}
+.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
+.field input:focus,.field textarea:focus{border-color:#FFB199;outline:none;box-shadow:0 0 0 3px rgba(255,177,153,.25)}
+.field textarea{min-height:100px;resize:vertical}
+.field input:disabled,.field textarea:disabled{opacity:.7}
+.field input[aria-invalid="true"]{border-color:var(--danger)}
+.help{font-size:13px;color:var(--muted);margin:0}
+.err{font-size:13px;color:var(--danger);margin:0;font-weight:800}
+.counter{font-family:var(--f-mono);font-size:12px;color:var(--dim);align-self:flex-end}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1px solid var(--line-strong);background:transparent;border-radius:999px;padding:0 16px;min-height:42px;font-weight:800;font-size:14px}
+.pill[aria-pressed="true"],.pill[aria-checked="true"]{background:#FF2D03;color:#fff;border-color:#FF2D03}
+/* atividade concluída = modo leitura: a resposta escolhida fica com cor cheia, o resto recua */
+.pill:disabled,.opt:disabled,.star:disabled{cursor:default}
+.pill:disabled:not([aria-pressed="true"]):not([aria-checked="true"]){opacity:.4}
+.pill:disabled[aria-pressed="true"],.pill:disabled[aria-checked="true"]{opacity:1}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:18px;padding:12px 16px;min-height:56px;font-weight:800}
+.opt::before{content:"";width:20px;height:20px;border-radius:50%;border:2px solid var(--line-strong);flex:0 0 auto}
+.opt[aria-checked="true"]{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+.opt[aria-checked="true"]::before{border-color:#FF2D03;background:radial-gradient(circle,#FF2D03 0 46%,transparent 52%)}
+.opt.box::before{border-radius:7px}
+.opt.box[aria-checked="true"]::before{background:#FF2D03 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/14px no-repeat;border-color:#FF2D03;box-shadow:none}
+.opt:disabled:not([aria-checked="true"]){opacity:.4}
+.bingo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.cell{aspect-ratio:1;border:1px solid var(--line-strong);border-radius:18px;background:rgba(255,255,255,.05);font-weight:800;font-size:13px;padding:6px;line-height:1.15;display:grid;place-items:center;text-align:center;min-width:0;overflow-wrap:anywhere}
+.cell[aria-pressed="true"]{background:rgba(255,45,3,.25);border-color:#FF8A6A}
+.cell.win{background:var(--grad);border-color:transparent;color:#fff}
+/* avaliação: abóboras apagadas que acendem até a nota escolhida (padrão de estrelas) */
+.stars{display:flex;justify-content:space-between;gap:4px;margin:4px 0 10px}
+.star{position:relative;flex:1;min-height:64px;display:grid;place-items:center;border:0;border-radius:16px;background:transparent;-webkit-tap-highlight-color:transparent}
+.star .pk{width:58px;height:auto;filter:grayscale(1) brightness(.75);opacity:.35;transition:filter .25s ease,opacity .25s ease,transform .2s ease}
+.star:not(.lit):hover:not(:disabled) .pk{opacity:.55}
+.star::before{content:"";position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,80,20,.55),rgba(255,45,3,.18) 60%,rgba(255,45,3,0));opacity:0;transform:scale(.6);transition:opacity .3s ease,transform .3s ease;pointer-events:none}
+/* brilho em pseudo-elemento: o drop-shadow em imagem animada era recortado num retângulo (Safari) */
+.star.lit::before{opacity:1;transform:scale(1)}
+.star .pk{position:relative}
+.star.lit .pk{filter:none;opacity:1;animation:pk-pop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i) * 60ms)}
+.star:focus-visible{outline:2px solid #FF2D03;outline-offset:2px}
+@keyframes pk-pop{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.star.lit .pk{animation:none}}
+.rate-score{font-family:var(--f-display);font-weight:800;color:var(--fg)}
+.rate-field{margin-top:14px}
+.rx-q{margin:22px 0 10px;font-family:var(--f-body);font-size:15px;font-weight:800;line-height:1.35}
+.rx-q:first-of-type{margin-top:6px}
+.rx-q small,.rx-field small{font-weight:500;color:var(--dim);font-size:13px}
+.grp:empty{display:none}
+.grp{margin-top:8px}
+.stars.abx{margin-bottom:4px}
+.stars.abx .pk{width:auto;height:58px}
+.rx-q:has(+ .rx-cap){margin-bottom:4px}
+.rx-cap{margin:0 0 10px;font-size:14px;line-height:1.4;color:var(--muted)}
+.rx-field{margin:20px 0 0}
+.rx-field>label{font-size:15px;font-weight:800}
+.rx-back{display:inline-flex;align-items:center;gap:4px;margin:0 0 4px -6px;min-height:36px;padding:0 10px 0 4px;border:0;border-radius:999px;background:none;color:var(--muted);font-weight:800;font-size:14px}
+.rx-back svg{width:18px;height:18px}
+.rx-step + .rx-step .rx-q:first-of-type{margin-top:22px}
+.rx-step + .rx-step .rx-back + .rx-q{margin-top:6px}
+.rx-back:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.rx-step.in{animation:rx-in .3s cubic-bezier(.2,.8,.2,1) both}
+.rx-step.back{animation:rx-back .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rx-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes rx-back{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.link-field{margin:14px 0 0}
+.link-field>label{font-size:14px;font-weight:800}
+.link-field .help,.link-field .err{margin-top:2px}
+.rate-field small{font-weight:500;color:var(--dim);font-size:13px}
+.rate-field textarea{min-height:88px}
+.done-note{display:flex;gap:10px;align-items:center;background:rgba(61,220,151,.12);color:var(--success);border-radius:16px;padding:12px 14px;font-weight:800;margin-bottom:16px}
+.done-note svg{width:20px;height:20px;flex:0 0 auto}
+
+/* ---------- câmera e resultado ---------- */
+/* ---------- câmera e resultado (Figma 2147:7344 / 2148:8155) — mesmo fundo e componentes da trilha ---------- */
+.cam,.result{z-index:30;background:#0B0613;isolation:isolate;overflow:hidden}
+/* câmera imersiva: prévia grande com cantos arredondados, controles flutuando sem faixas (vidro = mesmo da tab bar) */
+.cam{container-type:size}   /* medidas relativas à tela do app (funciona dentro da moldura de celular no desktop) */
+.ph-frame{position:relative;z-index:1;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(96px + env(safe-area-inset-bottom,0px))}
+.viewfinder{position:relative;height:min(calc(100cqh - 112px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)), calc((100cqw - 24px) * 16 / 9));width:auto;aspect-ratio:9/16;flex:0 0 auto;overflow:hidden;border-radius:28px;background:#1B1128;box-shadow:0 24px 48px -18px rgba(0,0,0,.7)}
+.viewfinder video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.viewfinder video.mirror{transform:scaleX(-1)}
+.vf-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vf-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;font-size:13px;font-weight:600;background:#F4F4F4}
+.vf-fallback span{color:#5b536a;max-width:240px}
+.vf-fallback svg{width:52px;height:52px;color:#8E829F}
+.glass-btn{display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);color:#fff}
+.glass-btn svg{width:22px;height:22px}
+.glass-btn:active{transform:scale(.94)}
+.ph-back{position:absolute;z-index:3;top:12px;left:12px;width:44px;height:44px}
+.ph-seg-bar{position:relative;z-index:1;display:flex;justify-content:center;padding:14px 20px 4px}
+.ph-seg-bar .fx-seg{width:auto;background:rgba(0,0,0,.31);border-color:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px)}
+.ph-seg-bar .fx-seg button{padding:0 16px;min-height:34px;font-size:13px}
+/* mesma geometria e posição da tab bar da home (64px de altura, 14px do fundo): o botão de câmera não sai do lugar ao trocar de tela */
+.cam-controls{position:absolute;z-index:2;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));height:64px;display:flex;justify-content:center;align-items:center;gap:18.5px;padding:0}
+.cam-side{width:52px;height:52px;flex:0 0 auto}
+/* obturador: anel branco + miolo laranja (FAB da tab bar) */
+.shutter{width:64px;height:64px;border-radius:50%;border:3px solid #fff;padding:3px;flex:0 0 auto;background:none;display:grid;place-items:center}
+.shutter span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#FF2D03;color:#fff;box-shadow:0 8px 20px -6px rgba(255,45,3,.7);transition:transform .12s}
+.shutter svg{width:24px;height:24px}
+.shutter:active span{transform:scale(.9)}
+.ph-fuxo{position:relative;overflow:visible;padding:0;transition:box-shadow .2s,opacity .2s}
+.ph-fuxo canvas{width:100%;height:100%;border-radius:50%;transition:filter .2s,opacity .2s}
+.ph-fuxo[aria-pressed="true"]{box-shadow:0 0 0 2.5px #FF2D03}
+.ph-ok{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:11px;background:#FF2D03;color:#fff;display:grid;place-items:center;box-shadow:0 0 0 2px #0B0613;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.ph-ok svg{width:13px;height:13px}
+.ph-fuxo[aria-pressed="false"] .ph-ok{transform:scale(0)}
+.shutter:focus-visible,.glass-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.result-body{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0}
+.result-body img{display:block;max-height:100%;max-width:100%;width:auto;height:auto;min-height:0;border-radius:28px;box-shadow:0 20px 40px -16px rgba(0,0,0,.6)}
+.result-body .hint{margin:8px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.result-foot{position:relative;z-index:1;padding:14px 20px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.result-foot .btn-save{background:#FF2D03;color:#fff;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
+.result-foot .btn-save svg{width:20px;height:20px}
+.result-foot .btn-secondary{background:rgba(255,255,255,.08);border:1px solid var(--line-strong);color:var(--fg)}
+/* ---------- modal + toast ---------- */
+.modal{position:absolute;inset:0;z-index:40;display:grid;place-items:center;padding:20px;background:rgba(5,2,10,.7)}
+.modal-card{width:100%;border-radius:32px;padding:24px 20px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--surface-strong);border:1px solid var(--line);animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.modal-card .glow{width:170px;height:170px}
+.modal-card .eyebrow{margin:0;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#FFB199}
+.modal-card h2{font-family:var(--f-display);font-weight:800;font-size:23px;margin:4px 0 0;line-height:1.2}
+.modal-card p{margin:0 0 12px;color:var(--muted)}
+.modal-card p b{color:var(--fg)}
+.toast{position:absolute;left:20px;right:20px;bottom:88px;z-index:50;background:var(--fg);color:#12091C;border-radius:18px;padding:13px 16px;font-weight:800;display:flex;gap:10px;align-items:center;animation:up .25s ease}
+.toast svg{width:20px;height:20px;color:#0E8560;flex:0 0 auto}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.wave{transform-origin:93px 70px;animation:wave 2.6s ease-in-out infinite}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg)}80%{transform:rotate(8deg)}90%{transform:rotate(-8deg)}}
+.float{animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <!-- ONBOARDING -->
+    <section class="screen ob" id="onboarding" aria-label="Como a trilha funciona" hidden>
+      <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <div class="ob-progress" id="ob-progress" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="ob-body" id="ob-body"></div>
+      <div class="ob-foot">
+        <button class="ob-btn ob-back" id="ob-back"><i data-lu="arrow-left"></i>Voltar</button>
+        <button class="ob-btn ob-next" id="ob-next">Próximo<i data-lu="arrow-right"></i></button>
+      </div>
+    </section>
+
+    <!-- CADASTRO (após o onboarding) -->
+    <section class="screen ob su" id="signup" aria-labelledby="su-title" hidden>
+      <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <form class="su-body" id="su-form" novalidate>
+        <canvas class="su-fuxo" id="su-fuxo" aria-hidden="true"></canvas>
+        <h1 id="su-title" tabindex="-1">Crie seu acesso</h1>
+        <p class="ob-sub su-sub" id="su-sub">Para não perder seu progresso, e nem seu Fuxo</p>
+        <label class="su-field" id="su-name-wrap"><span>Nome e sobrenome</span>
+          <input id="su-name" name="name" autocomplete="name" autocapitalize="words" placeholder="Ex.: Ana Souza" aria-describedby="su-name-err">
+          <small class="su-err" id="su-name-err" aria-live="polite"></small></label>
+        <label class="su-field"><span>E-mail</span>
+          <input id="su-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="voce@email.com" aria-describedby="su-email-err">
+          <small class="su-err" id="su-email-err" aria-live="polite"></small></label>
+        <p class="su-note">Usamos seu e-mail só para salvar sua trilha neste evento</p>
+        <div class="su-foot">
+          <button class="ob-btn ob-next su-cta" id="su-cta" type="submit">Começar a trilha<i data-lu="arrow-right"></i></button>
+          <button class="su-switch" id="su-switch" type="button">Já criei meu acesso</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- APP -->
+    <section class="screen" id="main" hidden>
+      <div class="trail-bg main-bg" id="main-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <div class="view" id="view-trilha"></div>
+      <nav class="tabbar" aria-label="Navegação principal">
+        <button class="tab" data-tab="trilha" aria-current="page"><i data-lu="route"></i><span>Trilha</span></button>
+        <span class="fab-wrap"><button class="fab" id="open-cam" aria-label="Tirar foto com o template"><i data-lu="camera"></i></button></span>
+        <button class="tab" id="open-editor"><i data-lu="ghost"></i><span>Fuxo</span></button>
+      </nav>
+    </section>
+
+    <!-- EDITOR DO MASCOTE -->
+    <section class="screen editor" id="editor" role="dialog" aria-modal="true" aria-label="Personalizar o Rabisco" hidden>
+      <div class="ed-top">
+        <button class="btn btn-icon" id="ed-cancel" aria-label="Cancelar"><i data-lu="x"></i></button>
+        <button class="btn btn-icon ok" id="ed-save" aria-label="Salvar personalização"><i data-lu="check"></i></button>
+      </div>
+      <div class="ed-preview"><div class="glow float" id="ed-preview"></div></div>
+      <p class="ed-hint" id="ed-hint" aria-live="polite">Toque nas opções para vestir o Rabisco</p>
+      <div class="ed-tabs" role="tablist" aria-label="Partes do Rabisco" id="ed-tabs"></div>
+      <div class="ed-panel" id="ed-panel" role="tabpanel"></div>
+      <div class="discard" id="discard" role="alertdialog" aria-labelledby="discard-t" hidden>
+        <p id="discard-t">Descartar as alterações no Rabisco?</p>
+        <button class="btn btn-primary" id="discard-keep">Continuar editando</button>
+        <button class="btn btn-ghost" id="discard-yes">Descartar</button>
+      </div>
+    </section>
+
+    <!-- FUXO: PERSONALIZAÇÃO -->
+    <section class="screen fx" id="fuxo" role="dialog" aria-modal="true" aria-labelledby="fx-title" hidden>
+      <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <header class="fx-top">
+        <button class="fx-back" id="fx-back" aria-label="Voltar para a trilha"><i data-lu="chevron-left"></i></button>
+        <h1 id="fx-title">Seu Fuxo</h1>
+        <div class="fx-actions"><button class="fx-icon-btn" id="fx-export" aria-label="Exportar o Fuxo"><i data-lu="share"></i></button><button class="fx-icon-btn fx-ok-btn" id="fx-save" aria-label="Salvar o Fuxo"><i data-lu="check"></i></button></div>
+      </header>
+      <div class="fx-stage"><canvas id="fx-stage-cv" role="img" aria-label="Prévia do Fuxo"></canvas></div>
+      <div class="fx-cats" id="fx-cats" role="tablist" aria-label="Partes do Fuxo"></div>
+      <div class="fx-panel" id="fx-panel" role="tabpanel"></div>
+      <p class="sr-only" id="fx-hint" aria-live="polite"></p>
+      <div class="discard" id="fx-discard" role="alertdialog" aria-labelledby="fx-discard-t" hidden>
+        <p id="fx-discard-t">Sair sem salvar as mudanças no Fuxo?</p>
+        <button class="btn btn-primary" id="fx-discard-keep">Continuar editando</button>
+        <button class="btn btn-ghost" id="fx-discard-yes">Sair sem salvar</button>
+      </div>
+    </section>
+
+    <!-- DRAWER DE ATIVIDADE -->
+    <div class="scrim" id="scrim" hidden></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+      <div class="grabber" aria-hidden="true"></div>
+      <button class="btn btn-icon sheet-close" id="sheet-close" aria-label="Fechar"><i data-lu="x"></i></button>
+      <div class="sheet-scroll" id="sheet-body"></div>
+      <div class="sheet-foot"><button class="btn btn-primary" id="sheet-cta">Concluir</button></div>
+    </div>
+
+    <!-- CÂMERA -->
+    <section class="screen cam" id="cam" role="dialog" aria-modal="true" aria-label="Tirar foto com o template" hidden>
+      <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <div class="ph-frame">
+        <div class="viewfinder" id="viewfinder">
+          <button class="glass-btn ph-back" id="cam-close" aria-label="Voltar para a trilha"><i data-lu="arrow-left"></i></button>
+          <video id="video" playsinline muted autoplay></video>
+          <div class="vf-fallback" id="vf-fallback"><i data-lu="camera"></i><span id="vf-msg">Abrindo a câmera…</span></div>
+          <canvas class="vf-overlay" id="overlay" aria-hidden="true"></canvas>
+        </div>
+      </div>
+      <div class="cam-controls">
+        <button class="glass-btn cam-side" id="pick-gallery" aria-label="Escolher foto da galeria"><i data-lu="image"></i></button>
+        <button class="shutter" id="shutter" aria-label="Tirar foto"><span><i data-lu="camera"></i></span></button>
+        <button class="glass-btn cam-side ph-fuxo" id="ph-fuxo" aria-pressed="true" aria-label="Mostrar o Fuxo na foto"><canvas aria-hidden="true"></canvas><span class="ph-ok" aria-hidden="true"><i data-lu="check"></i></span></button>
+      </div>
+      <input class="sr-only" type="file" accept="image/*" capture="user" id="file-cam" tabindex="-1" aria-hidden="true">
+      <input class="sr-only" type="file" accept="image/*" id="file-gal" tabindex="-1" aria-hidden="true">
+    </section>
+
+    <!-- RESULTADO -->
+    <section class="screen result" id="result" role="dialog" aria-modal="true" aria-label="Sua foto com o template" hidden>
+      <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
+      <div class="result-body">
+        <img id="result-img" alt="Sua foto com o template do Esquenta Detach">
+        <p class="hint" id="save-hint" aria-live="polite"></p>
+      </div>
+      <div class="result-foot">
+        <button class="btn btn-save" id="save-btn"><i data-lu="download"></i>Salvar no dispositivo</button>
+        <button class="btn btn-secondary" id="retake">Voltar</button>
+      </div>
+    </section>
+
+    <!-- MARCO CONCLUÍDO -->
+    <div class="modal" id="lvl" role="dialog" aria-modal="true" aria-labelledby="lvl-title" hidden>
+      <div class="modal-card">
+        <div class="glow" id="lvl-mascot"></div>
+        <p class="eyebrow" id="lvl-eyebrow">Marco concluído</p>
+        <h2 id="lvl-title"></h2>
+        <p id="lvl-text"></p>
+        <button class="btn btn-primary" id="lvl-go">Personalizar o Fuxo</button>
+        <button class="btn btn-ghost" id="lvl-close">Voltar para a trilha</button>
+      </div>
+    </div>
+
+    <!-- POÇÃO: caldeirão recebe os ingredientes → pote de abacaxi + cupom (antes da conquista normal) -->
+    <div class="rw pot" id="pot" role="dialog" aria-modal="true" aria-labelledby="pot-title" hidden>
+      <div class="rw-bokeh" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="rw-body pot-body">
+        <p class="rw-eyebrow" id="pot-eyebrow">Você preparou a Poção do Detach!</p>
+        <div class="rw-stage pot-stage" id="pot-stage"></div>
+        <h2 id="pot-title">Sua poção está pronta!</h2>
+        <p class="rw-text" id="pot-text"></p>
+        <div class="pot-coupon-wrap" id="pot-coupon"></div>
+      </div>
+      <div class="rw-foot"><button id="pot-go">Continuar</button></div>
+    </div>
+
+    <div class="rw" id="rw" role="dialog" aria-modal="true" aria-labelledby="rw-title" hidden>
+      <div class="rw-bokeh" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="rw-body">
+        <p class="rw-eyebrow" id="rw-eyebrow"></p>
+        <div class="rw-stage" id="rw-stage"></div>
+        <h2 id="rw-title"></h2>
+        <p class="rw-text" id="rw-text"></p>
+        <div class="rw-dots" id="rw-dots" aria-hidden="true"></div>
+      </div>
+      <div class="rw-foot"><button id="rw-go">Continuar</button><button id="rw-custom" class="rw-ghost">Personalizar Fuxo</button></div>
+      <div class="rw-wipe" aria-hidden="true"></div>
+    </div>
+
+    <div id="toast-host" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+/* ================= dados ================= */
+const SLOTS = [
+  {id:'s0', time:'08h30', short:'Coffee', title:'Credenciamento e coffee break', who:''},
+  {id:'s1', time:'09h00', short:'Abertura', title:'Abertura do evento', who:''},
+  {id:'s2', time:'09h20', chipTime:'08h30', short:'Palestra', title:'Harness Design e o impacto em times de produtos digitais', who:'Palestra · Wallyngson Guedes'},
+  {id:'s3', time:'10h20', short:'Detach', title:'Apresentação Detach + sorteio', who:''},
+  {id:'s4', time:'10h45', short:'Workshop', title:'Do prompt ao portfólio: layout e conteúdo com IA, publicado no GitHub Pages', who:'Workshop · Vanessa Sousa'},
+  {id:'s5', time:'11h45', short:'Encerramento', title:'Até a próxima!', who:''},
+];
+const STAGE_ICON = ['coffee','flag','mic','ticket','laptop','laptop'];
+const TRACK_N = 5; // a barra do topo tem 5 marcos (o encerramento não tem nó próprio no Figma)
+const POCAO = {type:'multi', min:3, max:3, label:'Escolha rápida', title:'Poção do Detach', desc:'Escolha 3 ingredientes que você quer levar para o evento principal.', options:['Repertório','Networking','Ferramentas de IA','Portfólio','Oportunidades','Inspiração'],
+  // cupom: placeholder até a organização definir código e benefício
+  coupon:{code:'ESQUENTA-DETACH', label:'Cupom de desconto'}};
+const ACTS = [
+  {id:'checkin', slot:'s0', type:'auto', label:'Automática', title:'Check-in', desc:'Você entrou na trilha pelo QR code. Essa já está feita.'},
+  {id:'monstro', slot:'s0', type:'single', label:'Escolha rápida', title:'Monstro do design', desc:'Qual monstro do design é você?', options:['Fantasma do pixel perfeito','Vampiro do feedback','Zumbi do Figma às 3h da manhã','Bruxa dos protótipos','Lobisomem do "só mais um ajuste"']},
+  {id:'conexao', slot:'s0', type:'multi', view:'list', min:1, label:'Networking', title:'Conexão no coffee', desc:'Converse com alguém que você ainda não conhece e marque o que vocês têm em comum.', options:['Usamos IA no trabalho','Somos da mesma área','Primeira vez num evento Detach','Já fizemos um portfólio com IA']},
+  {id:'gostosura', slot:'s1', type:'single', label:'Enquete', title:'Gostosura ou IAlucinação?', desc:'A IA no seu trabalho tem sido mais gostosura (ajudou de verdade) ou IAlucinação (atrapalhou)?', options:['Gostosura','IAlucinação']},
+  {id:'medo', slot:'s1', type:'single', label:'Enquete', title:'Seu maior medo com IA no design', desc:'Escolha a opção mais próxima do que você sente.', options:['Tudo ficar igual','Perder meu lugar','A IA alucinar no meio do projeto','Não tenho medo']},
+  {id:'mito', slot:'s2', type:'quiz', label:'Quiz', title:'Mito ou verdade?', desc:'Toque em Mito ou Verdade em cada frase. A resposta aparece na hora.', items:[
+    {q:'Um agente de IA bom não precisa de revisão humana.', a:'Mito', why:'Revisão humana é um dos guardrails mais importantes de um harness.'},
+    {q:'Dar mais contexto ao agente costuma melhorar o resultado.', a:'Verdade', why:'Contexto bem definido reduz respostas genéricas e alucinações.'},
+    {q:'Harness é só um prompt bem escrito.', a:'Mito', why:'O harness também inclui ferramentas, limites, avaliação e quando o agente deve parar.'}]},
+  {id:'exorcize', slot:'s2', type:'multi', min:2, max:2, label:'Escolha rápida', title:'Exorcize o agente', desc:'Um agente de IA está fazendo besteira no produto. Escolha os 2 melhores guardrails para ele.', note:['Guardrail','regra ou limite que mantém a IA no caminho certo.'], options:['Revisão humana antes de publicar','Limitar as ferramentas que ele pode usar','Dar mais contexto','Definir quando ele deve parar','Testar com casos reais']},
+  {id:'pocao', slot:'s3', ...POCAO},
+  {id:'invocando', slot:'s4', type:'checklist', label:'Checklist', title:'Invocando meu portfólio', desc:'Marque cada passo do ritual conforme avançar no workshop.', items:['Invoquei o layout','Dei vida ao conteúdo','Criei o repositório','Publiquei no GitHub Pages'], optional:[3], link:3},
+  {id:'raiox', slot:'s4', type:'raiox', label:'Feedback', title:'Raio-X do feitiço', desc:'Compartilhe sua experiência invocando seu portfólio',
+    trav:['Não travei','Layout com IA','Conteúdo com IA','Criar o repositório','Publicar no GitHub Pages'], ajuda:['O passo a passo','Os prompts','A explicação','Não me ajudou']},
+  {id:'abobora', slot:'s5', type:'rating', label:'Avaliação', title:'Quantas abóboras valem esse evento?', desc:'Toque nas abóboras para avaliar'},
+];
+const BLOBS = [['#FF4B27',.55,-266,122,420,420],['#FF4FFE',.7,188,412,420,420],['#8740E9',.6,171,-60,449,420],['#8740E9',.6,-185,646,449,420],['#D430A8',.38,-140,900,380,380],['#8740E9',.42,170,1500,420,420],['#FF4B27',.3,-120,1994,320,320]]
+  .map(([c,o,x,y,w,h]) => `<i class="blob" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c};opacity:${o}"></i>`).join('');
+
+/* Mascote: [id, nome, marcos necessários] */
+const BODY = [['amarelo','Amarelo','#FFD84D',0],['abobora','Abóbora','#FF9A3C',0],['fantasma','Fantasma','#EEE8F7',1],['roxo','Roxo','#A983FF',2],['zumbi','Zumbi','#8FD694',3],['rosa','Rosa','#FF8FCF',4]];
+const ACC = [['roxo','Roxo','#8740E9',0],['magenta','Magenta','#D430A8',0],['laranja','Laranja','#FF4B27',0],['noite','Noite','#2A1D3A',1],['verde','Verde','#3DDC97',2]];
+const PARTS = [
+  {id:'corpo', label:'Corpo', key:'pattern', opts:[['bochechas','Bochechas',0],['liso','Liso',0],['manchas','Manchas',1],['costura','Costura',2]], sw:{key:'body', label:'Cor do corpo', list:BODY}},
+  {id:'olhos', label:'Olhos', key:'eyes', opts:[['normal','Normal',0],['sono','Sonolento',0],['brilho','Brilhando',1],['ciclope','Ciclope',3]]},
+  {id:'boca', label:'Boca', key:'mouth', opts:[['sorriso','Sorriso',0],['ooh','Uuh!',0],['presas','Presas',1],['lingua','Língua',2]]},
+  {id:'cabeca', label:'Cabeça', key:'head', opts:[['antena','Antena',0],['nenhum','Nada',0],['bruxa','Chapéu de bruxa',1],['chifres','Chifres',2],['gato','Orelhas de gato',3],['abobora','Abóbora',4]], sw:{key:'headColor', label:'Cor do acessório', list:ACC, for:['bruxa','chifres','gato']}},
+  {id:'acessorio', label:'Acessórios', key:'acc', opts:[['nenhum','Nada',0],['oculos','Óculos',1],['gravata','Gravata',2],['mascara','Máscara',5]], sw:{key:'accColor', label:'Cor do acessório', list:ACC, for:['oculos','gravata','mascara']}},
+];
+const hexOf = (list,id) => (list.find(x => x[0] === id) || list[0])[2];
+
+/* ================= estado ================= */
+const KEY = 'esquenta-trilha-v3';
+const DEFAULT_MASCOT = {body:'amarelo', pattern:'bochechas', eyes:'normal', mouth:'sorriso', head:'antena', headColor:'roxo', acc:'nenhum', accColor:'laranja'};
+/* ---------- Fuxo: dados das peças (Figma "Monster att") ---------- */
+// sprite sheets exportados do Figma: [largura da célula, altura da célula, colunas, largura da peça, altura da peça]
+const FX_SHEETS = {corpo:[520,640,6,400,520], olhos:[280,240,10,160,120], boca:[280,240,10,160,120], bracos:[420,280,8,300,160], pernas:[420,280,9,300,160], caudas:[240,240,8,120,120], chapeus:[300,240,8,180,120], oculos:[280,180,6,160,60], cabeca:[320,250,10,200,130], pescoco:[320,230,9,200,110], asas:[420,260,3,300,140], capas:[440,380,4,320,260]};
+const FX_FORMATOS = ['Redondo','Quadrado','Retângulo','Triângulo','Fantasma','Fantasma liso'];
+const FX_ESTILOS = ['Liso','Peludo','Felpudo','Espinhos'];
+// posição dos encaixes em cada corpo (formato × estilo), copiada do componente "Monstro" do Figma:
+// [asasY, capaY, caudaX, cabecaY, bracosX, bracosY, bracoDirX, pernasX, pernaDirX, rostoY, pescocoY, oculosY, chapeuY]
+const FX_SLOTS = [
+  [110.5,181,270.2,46,1,229,278,91,98,152,228,180,40],[110.5,181,262.2,72,7,229,254,91,98,152,228,180,58],[110.5,181,254.8,54,2.2,229,262,91,98,152,228,180,42],[110.5,181,255.2,56,17.1,229,246,91,98,152,228,180,46],
+  [110.5,181,283,24,1,229,278,73,134,152,228,180,30],[110.5,181,267.4,30,4.4,229,258,73,134,152,228,180,36],[110.5,181,277.2,32,9,229,260,73,134,152,228,180,36],[110.5,181,280.4,28,14.3,229,251,73,134,152,228,180,32],
+  [110.5,181,243,30,41,229,198,73,134,152,228,180,30],[121.5,192,220,66,56.1,240,173,91,98,164,240,192,44],[110.5,181,230.2,44,48.9,229,181,79.7,121,152,228,180,34],[110.5,181,227.8,48,48,229,184,79.2,122,152,228,180,40],
+  [151.5,222,257.6,146,33.4,270,213,73,134,194,270,222,108],[145.5,216,255.5,140,44.6,264,215,73,134,188,264,216,92],[149.5,220,260.5,144,43.9,268,199,73,134,192,268,220,102],[137.5,208,250.7,132,28.3,256,206,73,134,180,256,208,90],
+  [110.5,181,268.9,50,21.6,229,237,73,134,152,228,180,42],[110.5,181,269.2,56,20.4,229,237,73,134,152,228,180,46],[110.5,181,266.9,58,23.2,229,228,73,134,152,228,180,40],[110.5,181,261.5,62,27.1,229,229,73,134,152,228,180,46],
+  [110.5,181,270.2,50,21.3,229,237,73,134,152,228,180,42],[110.5,181,252.1,56,32.8,229,218,73.7,133,152,228,180,60],[110.5,181,260.1,56,28,229,225,73,134,152,228,180,44],[110.5,181,268.7,58,31,229,226,73,134,152,228,180,44]
+];
+const FX_CORES = [['Roxo','#7b5cf0'],['Lilás','#a79cf6'],['Azul','#3f78f2'],['Azul claro','#73aaff'],['Verde','#33b985'],['Amarelo','#ffc23d'],['Laranja','#ff7a57'],['Rosa','#ff70b0'],['Marinho','#1d2048'],['Branco','#f6f4fb']];
+const FX_EXP_A = ['Aberto','Olhando para o lado','Olhando para cima','Olhando para baixo','Meio fechado','Sonolento','Desconfiado','Raiva','Furioso','Malvado','Triste','Chorando','Feliz','Sorriso nos olhos','Assustado','Surpreso','Fofo','Apaixonado','Tonto','Piscando'];
+const FX_EXP_B = ['Pontinhos','Pontinhos bravos','Pontinhos tristes','Fechados','Fechados felizes','Nocaute (X)','Malvado preenchido','Ovais fofos','Corações'];
+const FX_EXP = [...FX_EXP_A, ...FX_EXP_B];
+const FX_BOCAS = ['Sorriso','Sorriso pequeno','Sorriso com presa','Duas presas','Aberta feliz','Bocão com dentes','Língua de fora','Dentinhos','Gatinho','Reta','Triste','Brava','Ondulada','Surpresa','Grito','Careta','Malvada','Assobio','Bochechas + sorriso'];
+const FX_MAOS = ['Normal','Garras','Luva branca','Dedos'];
+const FX_CALCADOS = ['Patinha','Pata com garras','Tênis branco','Tênis laranja','All-star','Cano alto verde','Bota','Bota roxa','Galocha'];
+// acessórios: [nome, índice no sprite, recolorir com a cor do corpo (0 não, 1 sim, 2 sim + tom escuro)]
+const fxList = (names, mode=0) => names.map((n,i) => [n, i, mode]);
+const FX_ACC = {
+  chapeu:{label:'Chapéu', sheet:'chapeus', need:'s2', opts:fxList(['Bruxa','Boné vermelho','Boné azul','Boné preto','Boné amarelo','Boné verde','Trucker','Gorro verde','Gorro marinho','Gorro pompom','Gorro listrado','Bucket rosa','Coroa','Marinheiro','Faixa esportiva'])},
+  cauda:{label:'Cauda', sheet:'caudas', need:'s2', opts:fxList(['Ondulada','Listrada','Diabinho','Peluda','Pompom','Laço','Folha','Seta'], 1)},
+  oculos:{label:'Óculos', sheet:'oculos', need:'s3', opts:fxList(['Redondos','Escuros','Gatinho','Corações','Esqui roxo','Viseira azul','Visor cyber','Raio','Máscara ladrão','Máscara rosa','Monóculo'])},
+  cabeca:{label:'Cabeça', sheet:'cabeca', need:'s3', opts:[...['Chifres curvos','Chifres pontudos','Chifres de touro','Chifrinhos','Chifre único','Antenas','Antenas coloridas','Antenas longas','Orelhas de gato','Orelhas redondas','Orelhas de coelho','Espinhos'].map((n,t) => [n, t*10+9, 1]), ['Broto',120,0], ['Topete',121,1]]},
+  pescoco:{label:'Pescoço', sheet:'pescoco', need:'s4', opts:[...fxList(['Cachecol azul','Cachecol rosa','Cachecol verde','Cachecol laranja','Cachecol marinho','Cachecol roxo','Bandana laranja','Bandana roxa','Bandana azul','Bandana caveira','Lenço amarelo','Gravata','Gravata borboleta','Corrente de ouro','Coleira de spikes']), ['Cachecol listrado',24,1], ['Cachecol liso',34,1], ['Gola',44,1]]},
+  asas:{label:'Asas', sheet:'asas', need:'s4', opts:fxList(['Morcego','Anjo','Fada'])},
+  capa:{label:'Capa', sheet:'capas', need:'s5', opts:fxList(['Vampiro','Vampiro roxo','Herói','Mago'])},
+};
+const FX_DEFAULT = {formato:'Fantasma', estilo:'Liso', cor:'Roxo', q:'Dois olhos', exp:'Aberto', boca:'Sorriso', braco:'Curto', mao:'Normal', perna:'Curta', calcado:'Patinha', chapeu:null, cauda:null, oculos:null, cabeca:null, pescoco:null, asas:null, capa:null};
+// abas e quando cada uma libera (momento da trilha concluído)
+const FX_TABS = [['corpo','Corpo','ghost',null],['cor','Cor','palette',null],['rosto','Rosto','smile','s0'],['bracos','Braços','hand','s1'],['pernas','Pernas','footprints','s1'],['acessorios','Acessórios','witch-hat','s2']];
+const FX_UNLOCK_TXT = {s0:'o Rosto (olhos e boca)', s1:'braços e pernas', s2:'chapéus e caudas', s3:'óculos e acessórios de cabeça', s4:'acessórios de pescoço e asas', s5:'as capas'};
+const fresh = () => ({onboarded:false, done:{}, data:{}, mascot:{...DEFAULT_MASCOT}, fuxo:{...FX_DEFAULT}, slot:2, testMode:true});
+let S = load();
+function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const o = Object.assign(fresh(), JSON.parse(r)); o.mascot = {...DEFAULT_MASCOT, ...o.mascot}; o.fuxo = {...FX_DEFAULT, ...o.fuxo}; return o; } }catch(e){} return fresh(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); if(S.user && S.user.email){ const a = JSON.parse(localStorage.getItem('esquenta-contas-v1') || '{}'); a[S.user.email] = S; localStorage.setItem('esquenta-contas-v1', JSON.stringify(a)); } }catch(e){} }
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const actsOf = sid => ACTS.filter(a => a.slot === sid);
+const stageDone = sid => actsOf(sid).every(a => S.done[a.id]);
+const marcos = () => SLOTS.filter(s => stageDone(s.id)).length;
+const pctDone = () => Math.round(ACTS.filter(a => S.done[a.id]).length / ACTS.length * 100);
+const slotState = i => i < S.slot ? 'past' : i === S.slot ? 'now' : (S.testMode ? 'open' : 'locked');
+const isLocked = need => !S.testMode && need > marcos();
+const marcoTxt = n => `Complete ${n} ${n === 1 ? 'marco' : 'marcos'} da trilha`;
+function unlocksAt(n){
+  const out = [];
+  PARTS.forEach(p => { p.opts.forEach(o => { if(o[2] === n) out.push(o[1].toLowerCase()); }); if(p.sw && p.id !== 'acessorio') p.sw.list.forEach(c => { if(c[3] === n) out.push((p.sw.key === 'body' ? 'corpo ' : 'acessório ') + c[1].toLowerCase()); }); });
+  return out;
+}
+const listPt = a => a.length < 2 ? a.join('') : a.slice(0,-1).join(', ') + ' e ' + a[a.length-1];
+
+/* ================= ícones ================= */
+/* Ícones: Lucide (lucide-static 0.469.0, ISC), embutidos para funcionar offline */
+// "witch-hat" não existe na Lucide: desenhado no mesmo padrão (24×24, traço 2, pontas arredondadas)
+const LUCIDE = {"copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /><path d=\"M19 12H5\" />", "witch-hat": "<ellipse cx=\"12\" cy=\"19\" rx=\"9.5\" ry=\"2.5\"/><path d=\"M7.5 16.6 10.6 7.4C11.4 4.9 13.6 3.1 16.3 3H19.5c-2 .8-3.5 2.4-4.1 4.5L16.5 16.6\"/><path d=\"M8.7 13.2h7.1\"/>", "share": "<path d=\"M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8\" /><polyline points=\"16 6 12 2 8 6\" /><line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"15\" />", "palette": "<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\" /><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\" /><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\" /><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\" /><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\" />", "smile": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"M8 14s1.5 2 4 2 4-2 4-2\" /><line x1=\"9\" x2=\"9.01\" y1=\"9\" y2=\"9\" /><line x1=\"15\" x2=\"15.01\" y1=\"9\" y2=\"9\" />", "hand": "<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\" /><path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\" /><path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\" /><path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\" />", "footprints": "<path d=\"M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z\" /><path d=\"M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z\" /><path d=\"M16 17h4\" /><path d=\"M4 13h4\" />", "crown": "<path d=\"M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z\" /><path d=\"M5 21h14\" />", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"m4.9 4.9 14.2 14.2\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\"/><path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\"/><circle cx=\"18\" cy=\"5\" r=\"3\"/>", "ghost": "<path d=\"M9 10h.01\"/><path d=\"M15 10h.01\"/><path d=\"M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z\"/>", "camera": "<path d=\"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z\"/><circle cx=\"12\" cy=\"13\" r=\"3\"/>", "coffee": "<path d=\"M10 2v2\"/><path d=\"M14 2v2\"/><path d=\"M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1\"/><path d=\"M6 2v2\"/>", "flag": "<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" x2=\"4\" y1=\"22\" y2=\"15\"/>", "mic": "<path d=\"M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\"/>", "ticket": "<path d=\"M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z\"/><path d=\"M13 5v2\"/><path d=\"M13 17v2\"/><path d=\"M13 11v2\"/>", "laptop": "<path d=\"M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "lock": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "chevron-right": "<path d=\"m9 18 6-6-6-6\"/>", "chevron-left": "<path d=\"m15 18-6-6 6-6\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\"/>", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\"/><circle cx=\"9\" cy=\"9\" r=\"2\"/><path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\"/>", "switch-camera": "<path d=\"M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5\"/><path d=\"M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"m18 22-3-3 3-3\"/><path d=\"m6 2 3 3-3 3\"/>", "scan-face": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\"/><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"/><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"/><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"/><path d=\"M8 14s1.5 2 4 2 4-2 4-2\"/><path d=\"M9 9h.01\"/><path d=\"M15 9h.01\"/>", "signal": "<path d=\"M2 20h.01\"/><path d=\"M7 20v-4\"/><path d=\"M12 20v-8\"/><path d=\"M17 20V8\"/><path d=\"M22 4v16\"/>", "wifi": "<path d=\"M12 20h.01\"/><path d=\"M2 8.82a15 15 0 0 1 20 0\"/><path d=\"M5 12.859a10 10 0 0 1 14 0\"/><path d=\"M8.5 16.429a5 5 0 0 1 7 0\"/>", "battery-full": "<rect width=\"16\" height=\"10\" x=\"2\" y=\"7\" rx=\"2\" ry=\"2\"/><line x1=\"22\" x2=\"22\" y1=\"11\" y2=\"13\"/><line x1=\"6\" x2=\"6\" y1=\"11\" y2=\"13\"/><line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"13\"/><line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"13\"/>"};
+const lu = (name, sw=2) => `<svg class="lucide lucide-${name}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LUCIDE[name]}</svg>`;
+const ICON_CHECK = lu('check', 3);
+const ICON_LOCK = lu('lock', 2.4);
+const ICON_CHEV = lu('chevron-right', 2.4);
+document.querySelectorAll('i[data-lu]').forEach(el => { el.outerHTML = lu(el.dataset.lu); });
+const BAT = '<svg viewBox="0 0 48 24" width="%W" fill="currentColor" aria-hidden="true"><path d="M24 8c1.5-3 3-4 3-4l1 4c3-3 9-6 16-4-3 1-4 4-4 6-3-2-7-1-9 2-2-1-4 0-5 3-1-3-3-4-5-3-2-3-6-4-9-2 0-2-1-5-4-6 7-2 13 1 16 4l1-4s1.5 1 3 4z"/></svg>';
+const WEB = `<svg class="web" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="1.4" aria-hidden="true"><path d="M100 0L0 100M100 0L30 100M100 0L0 30M100 0L60 100M100 0L0 60"/><path d="M100 22L86 17L78 22L83 9L78 0M100 46L74 37L56 46L64 22L54 0M100 72L62 58L34 72L46 34L32 0"/></svg>`;
+
+/* ================= mascote (SVG original e parametrizado) ================= */
+let svgSeq = 0;
+function mascotSVG(m, px, opts={}){
+  const ink='#120A1C', body=hexOf(BODY,m.body), hc=hexOf(ACC,m.headColor), ac=hexOf(ACC,m.accColor), blue='#8740E9';
+  const id = 'm' + (++svgSeq);
+  const lbl = ['Rabisco'];
+  let s = `<svg class="mascot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="${px}" height="${px}" role="img" aria-label="%LBL%">`;
+  s += `<ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".25"/>`;
+  s += `<rect x="40" y="96" width="14" height="11" rx="5.5" fill="${ink}"/><rect x="66" y="96" width="14" height="11" rx="5.5" fill="${ink}"/>`;
+  s += `<path d="M28 72 Q15 74 15 86" stroke="${ink}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  s += `<g class="${opts.wave?'wave':''}"><path d="M93 70 Q106 66 107 53" stroke="${ink}" stroke-width="4.5" fill="none" stroke-linecap="round"/></g>`;
+  if(m.head === 'antena') s += `<line x1="60" y1="32" x2="60" y2="18" stroke="${ink}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="14" r="6" fill="#FF4B27" stroke="${ink}" stroke-width="3"/>`;
+  if(m.head === 'gato') s += `<path d="M31 46 L33 16 L54 33 Z" fill="${hc}" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/><path d="M89 46 L87 16 L66 33 Z" fill="${hc}" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/><path d="M36 37 L37 25 L46 32 Z M84 37 L83 25 L74 32 Z" fill="#FF8FCF"/>`;
+  if(m.head === 'chifres') s += `<path d="M36 38 Q24 20 34 9 Q35 24 46 32 Z" fill="${hc}" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/><path d="M84 38 Q96 20 86 9 Q85 24 74 32 Z" fill="${hc}" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/>`;
+  s += `<defs><clipPath id="${id}"><rect x="26" y="30" width="68" height="70" rx="26"/></clipPath></defs>`;
+  s += `<rect x="26" y="30" width="68" height="70" rx="26" fill="${body}"/>`;
+  s += `<g clip-path="url(#${id})">`;
+  s += `<rect x="26" y="78" width="68" height="22" fill="#000" opacity=".08"/>`;
+  if(m.pattern === 'manchas') s += `<circle cx="36" cy="44" r="6" fill="#000" opacity=".13"/><circle cx="85" cy="88" r="8" fill="#000" opacity=".13"/><circle cx="82" cy="42" r="4" fill="#000" opacity=".13"/><circle cx="40" cy="92" r="4" fill="#000" opacity=".13"/>`;
+  s += `</g><rect x="26" y="30" width="68" height="70" rx="26" fill="none" stroke="${ink}" stroke-width="4"/>`;
+  if(m.pattern === 'bochechas') s += `<ellipse cx="38" cy="76" rx="6" ry="3.5" fill="#FF5A7A" opacity=".55"/><ellipse cx="82" cy="76" rx="6" ry="3.5" fill="#FF5A7A" opacity=".55"/>`;
+  if(m.pattern === 'costura') s += `<path d="M34 46 Q50 40 64 47" stroke="${ink}" stroke-width="2.5" fill="none"/><path d="M39 40l-1 8M46 39l0 8M53 40l1 8M60 42l1 8" stroke="${ink}" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(m.acc === 'mascara') s += `<path d="M30 57 Q60 46 90 57 Q89 74 74 72 Q66 68 60 72 Q54 68 46 72 Q31 74 30 57Z" fill="${ac}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/><circle cx="47" cy="62" r="7.5" fill="${body}"/><circle cx="73" cy="62" r="7.5" fill="${body}"/>`;
+  // olhos
+  if(m.eyes === 'normal') s += `<circle cx="47" cy="63" r="5" fill="${ink}"/><circle cx="73" cy="63" r="5" fill="${ink}"/><circle cx="48.7" cy="61.3" r="1.7" fill="#fff"/><circle cx="74.7" cy="61.3" r="1.7" fill="#fff"/>`;
+  if(m.eyes === 'sono') s += `<path d="M41 62 a6 6 0 0 0 12 0Z M67 62 a6 6 0 0 0 12 0Z" fill="${ink}"/><path d="M40 62h14M66 62h14" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>`;
+  if(m.eyes === 'brilho') s += `<circle cx="47" cy="63" r="7" fill="${ink}"/><circle cx="73" cy="63" r="7" fill="${ink}"/><circle cx="49.5" cy="60.5" r="2.6" fill="#fff"/><circle cx="75.5" cy="60.5" r="2.6" fill="#fff"/><circle cx="45" cy="66" r="1.3" fill="#fff"/><circle cx="71" cy="66" r="1.3" fill="#fff"/>`;
+  if(m.eyes === 'ciclope') s += `<circle cx="60" cy="61" r="12" fill="#fff" stroke="${ink}" stroke-width="3.5"/><circle cx="61" cy="62" r="6" fill="${ink}"/><circle cx="63.5" cy="59.5" r="2" fill="#fff"/>`;
+  // boca
+  if(m.mouth === 'sorriso') s += `<path d="M52 78 Q60 86 68 78" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  if(m.mouth === 'ooh') s += `<ellipse cx="60" cy="81" rx="4.5" ry="5.5" fill="${ink}"/>`;
+  if(m.mouth === 'presas') s += `<path d="M50 77 Q60 85 70 77" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M53.5 80 l2 6 l2.5 -4.6Z M66.5 80 l-2 6 l-2.5 -4.6Z" fill="#fff" stroke="${ink}" stroke-width="1.4" stroke-linejoin="round"/>`;
+  if(m.mouth === 'lingua') s += `<path d="M50 77 Q60 90 70 77Z" fill="${ink}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/><path d="M56 82 Q60 92 64 82Z" fill="#FF6E8A"/>`;
+  if(m.acc === 'oculos') s += `<circle cx="47" cy="63" r="10.5" fill="#fff" fill-opacity=".18" stroke="${ac}" stroke-width="3.5"/><circle cx="73" cy="63" r="10.5" fill="#fff" fill-opacity=".18" stroke="${ac}" stroke-width="3.5"/><path d="M57.5 62h5M36.5 61l-9-3M83.5 61l9-3" stroke="${ac}" stroke-width="3.5" stroke-linecap="round"/>`;
+  if(m.acc === 'gravata') s += `<path d="M47 88 L60 94 L47 100Z M73 88 L60 94 L73 100Z" fill="${ac}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="94" r="3.6" fill="${ac}" stroke="${ink}" stroke-width="2.5"/>`;
+  if(m.head === 'bruxa') s += `<ellipse cx="60" cy="34" rx="42" ry="7.5" fill="${hc}" stroke="${ink}" stroke-width="3.5"/><path d="M40 33 Q46 20 52 12 Q60 2 76 5 Q66 11 66 18 L80 33 Z" fill="${hc}" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/><path d="M42 28 Q60 33 78 28 L80 33 Q60 37 40 33Z" fill="#FF4B27" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  if(m.head === 'abobora') s += `<rect x="57" y="1" width="6" height="10" rx="2" fill="#3C8B4E" stroke="${ink}" stroke-width="2.5"/><ellipse cx="60" cy="24" rx="25" ry="15" fill="#FF7A1A" stroke="${ink}" stroke-width="3.5"/><ellipse cx="60" cy="24" rx="11" ry="15" fill="none" stroke="${ink}" stroke-width="2.5"/><path d="M50 22l3-4 3 4zM64 22l3-4 3 4z" fill="${ink}"/><path d="M50 29 Q60 34 70 29" stroke="${ink}" stroke-width="2.5" fill="none"/>`;
+  // nome acessível
+  const pick = (part, val) => (PARTS.find(p => p.id === part).opts.find(o => o[0] === val) || [])[1];
+  if(m.head !== 'antena' && m.head !== 'nenhum') lbl.push('com ' + pick('cabeca', m.head).toLowerCase());
+  if(m.acc !== 'nenhum') lbl.push('com ' + pick('acessorio', m.acc).toLowerCase());
+  return s.replace('%LBL%', lbl.join(', ')) + `</svg>`;
+}
+
+/* ================= toast ================= */
+let toastT;
+function toast(text){
+  const host = $('#toast-host');
+  host.innerHTML = `<div class="toast">${ICON_CHECK}<span>${esc(text)}</span></div>`;
+  clearTimeout(toastT); toastT = setTimeout(() => host.innerHTML = '', 2600);
+}
+
+/* ================= onboarding ================= */
+let obStep = 0;
+// onboarding (Figma 2159:727): textos e layout das 3 telas
+const OB = [
+  {title:'Boas vindas ao esquenta DETACH!', text:'Cada momento da programação é um marco na barra: <b>complete as atividades de um momento para fechar o marco</b>',
+   art:() => `${trackHTML({demo:true})}<div class="ob-stack" aria-hidden="true"><div class="stage-card"><div class="stage-head"><span class="chip-time">08h30</span></div><h3>Aproveite o evento!</h3>
+     <ul class="acts">${[['Check-in','Concluída',1],['Monstro do design','Escolha rápida',0],['Conexão no coffee','Networking',0]].map(([t, m, d]) => `<li><span class="act ${d ? 'is-done' : ''}"><span class="check">${d ? ICON_CHECK : ''}</span><span class="act-text"><span class="act-title">${t}</span><span class="act-meta">${m}</span></span><span class="chev">${ICON_CHEV}</span></span></li>`).join('')}</ul></div></div>`},
+  {title:'Conheça o Fuxo', sub:'O nome dele vem de {UXFo}r e ele é seu monstrinho nesse evento!', text:'<b>Cada marco concluído desbloqueia fantasias e acessórios para personalizar o Fuxo</b>',
+   art:() => `<canvas class="ob-fuxo" id="ob-fuxo" role="img" aria-label="O Fuxo"></canvas><div class="ob-cats" aria-hidden="true">${FX_TABS.map(([id, label, icon], i) => `<span class="fx-cat" aria-selected="${i === 0}"><span class="ic">${lu(icon, 2)}</span><span>${label}</span></span>`).join('')}</div>`},
+  {title:'Use nosso template', sub:'(com ou sem o Fuxo)', text:'',
+   art:() => `<div class="ob-stories" aria-hidden="true"><img class="s1" src="assets/ob-story-sem.png?v=3" alt=""><img class="s2" src="assets/ob-story-com.png?v=3" alt=""></div>`},
+];
+// mockup do story: o "fotografado" é um Fuxo gigante (como no Figma) + o template por cima
+async function obStory(cv, withFx){
+  const W = 1080, H = 1920, dpr = Math.min(2, window.devicePixelRatio || 1), sw = cv.clientWidth, sh = cv.clientHeight;
+  cv.width = Math.round(sw*dpr); cv.height = Math.round(sh*dpr);
+  const ctx = cv.getContext('2d'), k = cv.width / W; ctx.scale(k, k);
+  ctx.fillStyle = '#8A6BF5'; ctx.fillRect(0, 0, W, H);
+  await fxLoad();
+  const big = {...FX_DEFAULT}; ctx.save(); ctx.translate(540 - 200*5.2, 300 - 130*5.2); ctx.scale(5.2, 5.2); fxDraw(ctx, big, ['corpo','olhos','boca']); ctx.restore();
+  const keep = withMascot; withMascot = withFx; await drawTemplate(ctx, W, H); withMascot = keep;
+}
+function renderOB(){
+  const st = OB[obStep];
+  $('#ob-body').innerHTML = `<h1 tabindex="-1" id="ob-title">${st.title}</h1>${st.sub ? `<p class="ob-sub">${st.sub}</p>` : ''}<div class="ob-art">${st.art()}</div>${st.text ? `<p class="ob-text">${st.text}</p>` : ''}`;
+  [...$('#ob-progress').children].forEach((el,i) => {
+    const on = i <= obStep, was = el.classList.contains('on');
+    el.classList.remove('fill', 'unfill');
+    if(on && !was){ void el.offsetWidth; el.classList.add('fill'); }      // acabou de encher: brilho passa por cima
+    if(!on && was) el.classList.add('unfill');                             // voltou: esvazia da direita para a esquerda
+    el.classList.toggle('on', on);
+  });
+  $('#ob-back').style.visibility = obStep === 0 ? 'hidden' : '';
+  if(!document.querySelector('#onboarding .blob')) $('#onboarding .trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  if(obStep === 1) fxLoad().then(() => { const cv = $('#ob-fuxo'); if(cv){ const m = S.fuxo || FX_DEFAULT, [bx, by, bw, bh] = fxBBox(m), sz = Math.max(bw, bh*300/290) + 16; fxRender(cv, m, {crop: [bx + bw/2 - sz/2, by + bh/2 - sz*290/300/2, sz, sz*290/300]}); } });
+}
+$('#ob-next').onclick = () => { if(obStep < OB.length-1){ obStep++; renderOB(); $('#ob-title').focus(); } else finishOB(); };
+$('#ob-back').onclick = () => { if(obStep > 0){ obStep--; renderOB(); $('#ob-title').focus(); } };
+function finishOB(){
+  S.onboarded = true; save();
+  $('#onboarding').hidden = true;
+  if(!S.user){ openSignup(); return; }
+  enterTrail();
+}
+function enterTrail(){
+  $('#signup').hidden = true; $('#main').hidden = false;
+  renderTrilha();
+  if(!S.done.checkin) setTimeout(() => complete('checkin'), 350);
+}
+
+/* ================= cadastro =================
+   Protótipo: as contas ficam guardadas neste aparelho (localStorage), por e-mail.
+   No produto real, esse cadastro vai para um servidor; aí dá para voltar à trilha em qualquer aparelho. */
+const ACCOUNTS = 'esquenta-contas-v1';
+const accounts = () => { try{ return JSON.parse(localStorage.getItem(ACCOUNTS)) || {}; }catch(e){ return {}; } };
+const normEmail = e => e.trim().toLowerCase();
+const okEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+let suLogin = false;
+function openSignup(login = false){
+  suLogin = login;
+  const su = $('#signup'); su.hidden = false; su.classList.toggle('is-login', login);
+  if(!su.querySelector('.blob')) su.querySelector('.trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  $('#su-title').textContent = login ? 'Bem-vindo de volta!' : 'Crie seu acesso';
+  $('#su-sub').textContent = login ? 'Digite o e-mail que você usou' : 'Para não perder seu progresso, e nem seu Fuxo';
+  $('#su-cta').firstChild.textContent = login ? 'Entrar' : 'Começar a trilha';
+  $('#su-switch').textContent = login ? 'Ainda não tenho acesso' : 'Já criei meu acesso';
+  ['name','email'].forEach(k => { $('#su-' + k).removeAttribute('aria-invalid'); $('#su-' + k + '-err').textContent = ''; });
+  fxLoad().then(() => { const cv = $('#su-fuxo'), m = S.fuxo || FX_DEFAULT, [bx, by, bw, bh] = fxBBox(m), sz = Math.max(bw, bh) + 40; fxRender(cv, m, {crop:[bx + bw/2 - sz/2, by + bh/2 - sz/2, sz, sz]}); });
+  $('#su-title').focus();
+}
+function suError(k, msg){ const i = $('#su-' + k); i.setAttribute('aria-invalid', msg ? 'true' : 'false'); $('#su-' + k + '-err').textContent = msg; return !msg; }
+['name','email'].forEach(k => $('#su-' + k).addEventListener('input', () => { if($('#su-' + k).getAttribute('aria-invalid') === 'true') suError(k, ''); }));
+$('#su-switch').onclick = () => openSignup(!suLogin);
+$('#su-form').onsubmit = e => {
+  e.preventDefault();
+  const name = $('#su-name').value.trim().replace(/\s+/g, ' '), email = normEmail($('#su-email').value);
+  let ok = true;
+  if(!suLogin){ ok = suError('name', !name ? 'Digite seu nome e sobrenome' : name.split(' ').length < 2 ? 'Inclua também o sobrenome' : '') && ok; }
+  ok = suError('email', !email ? 'Digite seu e-mail' : !okEmail(email) ? 'Confira o e-mail: parece que falta algo (ex.: voce@email.com)' : '') && ok;
+  if(!ok){ (document.querySelector('#su-form [aria-invalid="true"]'))?.focus(); return; }
+  const acc = accounts();
+  if(suLogin){
+    if(!acc[email]){ suError('email', 'Não encontramos uma trilha com esse e-mail. Confira ou crie um acesso.'); $('#su-email').focus(); return; }
+    S = Object.assign(fresh(), acc[email]); S.onboarded = true; save();
+    toast(`Que bom te ver de novo, ${S.user.name.split(' ')[0]}!`); enterTrail(); return;
+  }
+  if(acc[email]){ suError('email', 'Esse e-mail já tem uma trilha. Toque em "Já criei meu acesso" para entrar.'); $('#su-email').focus(); return; }
+  S.user = {name, email}; save(); enterTrail();
+};
+
+/* ================= barra de progresso do evento ================= */
+// A barra mostra em que momento o EVENTO está (Figma 2045:53): marcos passados em laranja, o atual com anel.
+function trackHTML(opt={}){
+  // Linha = horário do evento (anda sozinha). Anel ao redor do nó = SUAS atividades daquele momento.
+  const nowI = opt.demo ? 2 : S.slot;
+  // o encerramento não tem nó próprio na barra: suas atividades contam no último nó
+  const stageActs = i => SLOTS.slice(i, i === TRACK_N - 1 ? SLOTS.length : i + 1).flatMap(s => actsOf(s.id));
+  const C = 2 * Math.PI * 13; // circunferência do anel (r=13)
+  let doneStages = 0;
+  const segs = SLOTS.slice(0, TRACK_N).map((s,i) => {
+    const acts = stageActs(i), n = acts.filter(a => S.done[a.id]).length;
+    const ratio = opt.demo ? [1, 1, .5, 0, 0][i] : (acts.length ? n / acts.length : 0);
+    const full = ratio === 1; if(full) doneStages++;
+    const st = [full ? 'complete' : '', i === nowI && !opt.demo ? 'now' : ''].join(' ');   // no tutorial: sem "ao vivo", só o progresso parcial
+    const ring = ratio > 0 && !full ? `<svg class="node-ring" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" stroke-dasharray="${(C * ratio).toFixed(2)} ${C.toFixed(2)}"/></svg>` : '';
+    const label = `${s.short}${opt.demo ? '' : ` · ${n} de ${acts.length} atividades`}${i === nowI ? ' · acontecendo agora' : ''}`;
+    return `<div class="seg"><div class="seg-bar"><span style="width:${i < nowI ? 100 : 0}%"></span></div>${opt.demo ? `<span class="node ${st}">${lu(STAGE_ICON[i])}${ring}</span>` : `<button class="node ${st}" data-scroll="${s.id}" aria-label="Ir para ${esc(label)}" title="${esc(label)}">${lu(STAGE_ICON[i])}${ring}</button>`}</div>`;
+  }).join('');
+  const aria = opt.demo ? 'Exemplo da barra da trilha' : `Acontecendo agora: ${SLOTS[S.slot].short}. Você concluiu ${doneStages} de ${TRACK_N} momentos.`;
+  return `<div class="track" role="${opt.demo ? 'img' : 'group'}" aria-label="${aria}">${segs}</div>`;
+}
+
+/* ================= trilha ================= */
+function renderTrilha(){
+  if(!document.querySelector('#main-bg .blob')) $('#main-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  const doneCount = ACTS.filter(a => S.done[a.id]).length, now = SLOTS[S.slot];
+  const nowLeft = actsOf(now.id).filter(a => !S.done[a.id]).length;
+  const nowSub = now.who || (nowLeft ? `${nowLeft} ${nowLeft === 1 ? 'atividade disponível' : 'atividades disponíveis'}` : 'Você fez tudo deste momento');
+  let h = `<div class="trail">
+  <header class="top" id="top">
+    <div class="top-main">
+      <div class="top-row">
+        <button class="avatar" id="avatar" aria-label="Personalizar o Fuxo"><img src="assets/monstro-avatar.svg" width="52" height="52" alt=""><canvas aria-hidden="true"></canvas></button>
+        <div class="top-title"><h1>Sua trilha</h1><p class="kicker">🔥 Esquenta Detach!</p></div>
+        <div class="score"><span class="pct">${pctDone()}<span>%</span></span><small>${doneCount} de ${ACTS.length} atividades</small></div>
+      </div>
+      ${trackHTML()}
+    </div>
+  </header>
+  <div class="content">
+    <section class="now-card" aria-labelledby="now-title">
+      <img class="nc-deco nc-glow" src="assets/card-glow.svg" width="353" height="274" alt="">
+      <div class="nc-deco nc-tex" aria-hidden="true"></div>
+      <img class="nc-deco nc-web" src="assets/card-web.svg" width="218" height="208" alt="">
+      <div class="nc-info">
+        <div class="nc-row"><span class="now-icon">${lu(STAGE_ICON[S.slot])}</span><div class="nc-chips"><span class="chip-agora">Agora</span><span class="chip-time">${now.time}</span></div></div>
+        <h2 class="nc-title" id="now-title">${esc(now.title)}</h2>
+        <p class="nc-sub">${esc(nowSub)}</p>
+      </div>
+      <button class="btn btn-dark" data-scroll="${now.id}">${nowLeft ? 'Ver atividades' : 'Ver momento'}${lu('arrow-right', 2.4)}</button>
+    </section>
+    <div class="sec-head"><h2>Programação</h2><span>${doneCount}/${ACTS.length} feitas</span></div>
+    <ol class="stages">`;
+  SLOTS.forEach((s,i) => {
+    const st = slotState(i), acts = actsOf(s.id), all = stageDone(s.id);
+    const timeChip = `<span class="chip-time">${s.chipTime || s.time}</span>`;
+    const head = st === 'locked' ? `<span class="chip-line chip-wait">Libera às ${s.time}</span>`
+      : st === 'open' ? `${timeChip}<span class="chip-line chip-wait">Liberado no modo teste</span>`
+      : all ? `${timeChip}<span class="chip-line chip-done">Concluído</span>`
+      : st === 'now' ? `${timeChip}<span class="chip-agora">Acontecendo agora</span>`
+      : `${timeChip}<span class="chip-line">Ainda dá tempo!</span>`;
+    h += `<li class="stage-card is-${st}" id="stage-${s.id}">
+      <div class="stage-head">${head}</div>
+      <h3>${esc(s.title)}</h3>${s.who ? `<p class="who">${esc(s.who)}</p>` : ''}
+      <ul class="acts">${acts.map(a => actCard(a, st === 'locked')).join('')}</ul></li>`;
+  });
+  h += `</ol>
+  </div>
+  <div class="demo">
+    <p class="demo-label">Controles do protótipo</p>
+    <label for="demo-slot">Simular horário do evento</label>
+    <select id="demo-slot">${SLOTS.map((s,i)=>`<option value="${i}" ${i===S.slot?'selected':''}>${s.time} · ${esc(s.short)}</option>`).join('')}</select>
+    <label class="demo-check"><input type="checkbox" id="demo-unlock" ${S.testMode?'checked':''}> Desbloquear tudo (atividades e itens do Rabisco)</label>
+    <div class="demo-links"><button id="demo-tutorial">Ver tutorial de novo</button><button id="demo-reset">Reiniciar protótipo</button></div>
+  </div>
+  </div>`;
+  const v = $('#view-trilha'), y = v.scrollTop;
+  v.innerHTML = h; v.scrollTop = y;
+  const top = $('#top');
+  const nav = document.querySelector('.tabbar');
+  let lastY = v.scrollTop;
+  const onScroll = () => {
+    const y = v.scrollTop;
+    top.classList.toggle('is-scrolled', y > 4);
+    // menu diminui ao rolar para baixo e volta ao tamanho normal ao rolar para cima
+    if(Math.abs(y - lastY) > 4){ nav.classList.toggle('is-compact', y > lastY && y > 40); lastY = y; }
+  };
+  v.onscroll = onScroll; top.classList.toggle('is-scrolled', v.scrollTop > 4);
+  $('#demo-slot').onchange = e => { S.slot = +e.target.value; save(); renderTrilha(); };
+  $('#demo-unlock').onchange = e => { S.testMode = e.target.checked; save(); renderTrilha(); };
+  $('#demo-reset').onclick = () => { S = fresh(); save(); boot(); };
+  $('#demo-tutorial').onclick = () => { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; };
+  $('#avatar').onclick = openEditor;
+  fxPaintAvatar(); fxBadge();
+}
+/* ---------- itens novos do Fuxo: notificação na barra + destaque na aba/pílula até a pessoa ver ---------- */
+const fxIsNew = k => (S.fxNew || []).includes(k);
+const fxAccNew = () => Object.keys(FX_ACC).filter(fxIsNew);
+function fxBadge(){
+  const b = $('#open-editor'), on = (S.fxNew || []).length > 0;
+  b.classList.toggle('has-new', on); b.setAttribute('aria-label', on ? 'Fuxo: há itens novos para personalizar' : 'Fuxo');
+}
+function fxSeen(k){ if(!fxIsNew(k)) return; S.fxNew = S.fxNew.filter(x => x !== k); save(); fxBadge(); }
+function actCard(a, locked){
+  const done = !!S.done[a.id];
+  const meta = done ? 'Concluída' : locked ? 'Bloqueada até o horário' : a.label;
+  return `<li><button class="act ${done?'is-done':''}" data-act="${a.id}" ${locked?'disabled':''}>
+    <span class="check">${done ? ICON_CHECK : locked ? ICON_LOCK : ''}</span>
+    <span class="act-text"><span class="act-title">${esc(a.title)}</span><span class="act-meta">${meta}</span></span>
+    ${locked ? '' : `<span class="chev">${ICON_CHEV}</span>`}</button></li>`;
+}
+$('#main').addEventListener('click', e => {
+  const sc = e.target.closest('[data-scroll]');
+  if(sc){ const el = document.getElementById('stage-' + sc.dataset.scroll), v = $('#view-trilha'); v.scrollTo({top: el.offsetTop - $('.top').offsetHeight - 12, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); return; }
+  const a = e.target.closest('[data-act]'); if(a && !a.disabled) openSheet(a.dataset.act);
+});
+$('#open-editor').onclick = openEditor;
+document.querySelector('.tab[data-tab="trilha"]').onclick = () => $('#view-trilha').scrollTo({top:0, behavior:'smooth'});
+
+/* ================= conclusão + marco ================= */
+function complete(id){
+  const a = ACTS.find(x => x.id === id);
+  if(!a || S.done[id]) return;
+  const before = marcos();
+  S.done[id] = true; save();
+  renderTrilha();
+  const after = marcos();
+  // momento inteiro concluído → tela de recompensa com o que foi liberado
+  if(after > before && stageDone(a.slot)){
+    // guarda o que foi liberado como "novo" até a pessoa ver na página do Fuxo
+    const gains = (RW_GAINS[a.slot] || []).flatMap(g => g.acc || [g.ill]);
+    S.fxNew = [...new Set([...(S.fxNew || []), ...gains])]; save(); fxBadge();
+    const slot = SLOTS.find(s => s.id === a.slot);
+    // Poção: primeiro o caldeirão + pote com cupom; ao continuar, a conquista normal do momento
+    setTimeout(() => a.coupon ? showPotion(a, () => showReward(slot)) : showReward(slot), 500);
+  } else if(a.coupon) setTimeout(() => showPotion(a), 500);
+}
+function showMarco(slot, n){
+  $('#lvl-mascot').innerHTML = '<canvas style="width:150px;height:170px" aria-hidden="true"></canvas>';
+  fxLoad().then(() => fxRender($('#lvl-mascot canvas'), S.fuxo, {w:150, h:170}));
+  $('#lvl-eyebrow').textContent = `Marco ${n} de ${SLOTS.length}`;
+  $('#lvl-title').textContent = `${slot.short}: concluído!`;
+  const u = FX_UNLOCK_TXT[slot.id];
+  $('#lvl-text').innerHTML = u ? `Você liberou ${esc(u)} para personalizar o Fuxo.` : `Você completou todas as atividades deste momento.`;
+  $('#lvl').hidden = false; $('#lvl-go').focus();
+}
+$('#lvl-go').onclick = () => { $('#lvl').hidden = true; closeSheet(); openEditor(); };
+$('#lvl-close').onclick = () => { $('#lvl').hidden = true; };
+
+/* ================= editor do mascote ================= */
+let draft = null, edTab = 'corpo', edReturn = null;
+function openRabiscoEditor(){
+  edReturn = document.activeElement; draft = {...S.mascot}; edTab = 'corpo';
+  $('#editor').hidden = false; $('#discard').hidden = true;
+  renderEditor(); $('#ed-save').focus();
+}
+function renderEditor(){
+  $('#ed-preview').innerHTML = mascotSVG(draft, 180, {wave:true});
+  $('#ed-tabs').innerHTML = PARTS.map(p => `<button class="ed-tab" role="tab" id="tab-${p.id}" aria-selected="${p.id===edTab}" data-edtab="${p.id}">${p.label}</button>`).join('');
+  const p = PARTS.find(x => x.id === edTab);
+  let h = `<div class="ed-row" aria-label="Estilos de ${p.label.toLowerCase()}">`;
+  p.opts.forEach(([id, name, need]) => {
+    const lock = isLocked(need);
+    h += `<button class="tile" data-key="${p.key}" data-val="${id}" data-need="${need}" aria-pressed="${draft[p.key]===id}" ${lock?'aria-disabled="true"':''} aria-label="${name}${lock?', bloqueado: '+marcoTxt(need).toLowerCase():''}">
+      ${lock ? `<span class="lock">${ICON_LOCK}</span>` : ''}${mascotSVG({...draft, [p.key]:id}, 84)}<span>${name}</span></button>`;
+  });
+  h += `</div>`;
+  if(p.sw && (!p.sw.for || p.sw.for.includes(draft[p.key]))){
+    const cur = p.sw.list.find(c => c[0] === draft[p.sw.key]) || p.sw.list[0];
+    h += `<div class="ed-sub"><div class="ed-sub-head"><h3>${p.sw.label}</h3><span>${cur[1]}</span></div><div class="swatches">`;
+    p.sw.list.forEach(([id, name, hex, need]) => {
+      const lock = isLocked(need);
+      h += `<button class="sw" style="background:${hex}" data-key="${p.sw.key}" data-val="${id}" data-need="${need}" aria-pressed="${draft[p.sw.key]===id}" ${lock?'aria-disabled="true"':''} aria-label="${name}${lock?', bloqueado':''}">${lock?`<span class="lock">${ICON_LOCK}</span>`:''}</button>`;
+    });
+    h += `</div></div>`;
+  }
+  $('#ed-panel').innerHTML = h;
+  $('#ed-panel').setAttribute('aria-labelledby', 'tab-' + edTab);
+}
+$('#ed-tabs').addEventListener('click', e => { const t = e.target.closest('[data-edtab]'); if(!t) return; edTab = t.dataset.edtab; $('#ed-hint').className = 'ed-hint'; $('#ed-hint').textContent = 'Toque nas opções para vestir o Rabisco'; renderEditor(); document.getElementById('tab-'+edTab).focus(); });
+$('#ed-tabs').addEventListener('keydown', e => {
+  if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  const i = PARTS.findIndex(p => p.id === edTab), n = (i + (e.key === 'ArrowRight' ? 1 : -1) + PARTS.length) % PARTS.length;
+  edTab = PARTS[n].id; renderEditor(); document.getElementById('tab-'+edTab).focus();
+});
+$('#ed-panel').addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  if(b.getAttribute('aria-disabled') === 'true'){ const hint = $('#ed-hint'); hint.className = 'ed-hint warn'; hint.textContent = marcoTxt(+b.dataset.need) + ' para liberar.'; return; }
+  const row = $('#ed-panel').scrollTop, rowX = b.parentElement.scrollLeft, cls = b.parentElement.className;
+  draft[b.dataset.key] = b.dataset.val; $('#ed-hint').className = 'ed-hint'; $('#ed-hint').textContent = 'Toque nas opções para vestir o Rabisco';
+  renderEditor();
+  $('#ed-panel').scrollTop = row; const again = $('#ed-panel').querySelector('.' + cls.split(' ')[0]); if(again) again.scrollLeft = rowX;
+  $(`#ed-panel [data-key="${b.dataset.key}"][data-val="${b.dataset.val}"]`)?.focus();
+});
+const changed = () => JSON.stringify(draft) !== JSON.stringify(S.mascot);
+function closeEditor(){ $('#editor').hidden = true; draft = null; if(edReturn && document.contains(edReturn)) edReturn.focus(); }
+$('#ed-save').onclick = () => { const c = changed(); S.mascot = {...draft}; save(); closeEditor(); renderTrilha(); if(c) toast('Rabisco atualizado'); };
+$('#ed-cancel').onclick = () => { if(changed()){ $('#discard').hidden = false; $('#discard-keep').focus(); } else closeEditor(); };
+$('#discard-keep').onclick = () => { $('#discard').hidden = true; $('#ed-cancel').focus(); };
+$('#discard-yes').onclick = closeEditor;
+
+/* ================= Fuxo: renderização em camadas ================= */
+const FX_IMG = {}; let fxReady = null;
+function fxLoad(){
+  if(!fxReady) fxReady = Promise.all(Object.keys(FX_SHEETS).map(k => new Promise(res => {
+    const im = new Image(); im.onload = () => { FX_IMG[k] = im; res(); }; im.onerror = () => res(); im.src = 'assets/fuxo/' + k + '.png';
+  })));
+  return fxReady;
+}
+const FX_CACHE = new Map();
+const fxFree = (...cs) => cs.forEach(c => { if(c && c.width){ c.width = 0; c.height = 0; } });
+const fxHex = m => (FX_CORES.find(c => c[0] === m.cor) || FX_CORES[0])[1];
+// troca o roxo do Figma pela cor escolhida. Pega todos os tons de roxo (base, sombra e brilho) pelo matiz
+// e preserva a variação de luz de cada pixel, para não sobrar contorno roxo.
+// mode 1 = qualquer tom de roxo · mode 3 = só o roxo exato do corpo (usado na Bota roxa, que é roxa de propósito)
+const fxHsl = (r, g, b) => { r/=255; g/=255; b/=255; const mx = Math.max(r,g,b), mn = Math.min(r,g,b), l = (mx+mn)/2; if(mx === mn) return [0,0,l]; const d = mx-mn, s = l > .5 ? d/(2-mx-mn) : d/(mx+mn); let h = mx === r ? (g-b)/d + (g < b ? 6 : 0) : mx === g ? (b-r)/d + 2 : (r-g)/d + 4; return [h*60, s, l]; };
+function fxRgb(h, s, l){ const q = l < .5 ? l*(1+s) : l+s-l*s, p = 2*l-q, f = t => { t = (t+1)%1; return t < 1/6 ? p+(q-p)*6*t : t < .5 ? q : t < 2/3 ? p+(q-p)*(2/3-t)*6 : p; }; const H = h/360; return [f(H+1/3)*255, f(H)*255, f(H-1/3)*255]; }
+const fxIsPurple = (r, g, b, mode) => {
+  if(mode === 3){ const s = r+g+b; return s > 60 && Math.abs(r/s-.2703) + Math.abs(g/s-.2022) < .02; }
+  const [h, s] = fxHsl(r, g, b); return h >= 238 && h <= 268 && s > .45;
+};
+function fxRecolor(c, hex, mode, yStop = Infinity){
+  const x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height), p = d.data, lim = Math.min(p.length, yStop * c.width * 4);
+  const [th, ts, tl] = fxHsl(...[1,3,5].map(i => parseInt(hex.slice(i, i+2), 16)));
+  for(let i = 0; i < lim; i += 4){
+    if(!p[i+3] || !fxIsPurple(p[i], p[i+1], p[i+2], mode)) continue;
+    const l = fxHsl(p[i], p[i+1], p[i+2])[2], o = fxRgb(th, ts, Math.max(0, Math.min(1, tl + (l - .651))));
+    p[i] = o[0]; p[i+1] = o[1]; p[i+2] = o[2];
+  }
+  x.putImageData(d, 0, 0);
+}
+// boca no corpo Marinho: o traço azul-marinho vira branco para não sumir
+function fxWhiteInk(c){
+  const x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+  for(let i = 0; i < p.length; i += 4){ if(!p[i+3]) continue; const [h, s, l] = fxHsl(p[i], p[i+1], p[i+2]); if(l < .32 && (s < .2 || (h > 215 && h < 260))){ p[i] = p[i+1] = p[i+2] = 255; } }
+  x.putImageData(d, 0, 0);
+}
+// textura Peluda: tufos arredondados ao longo do contorno (tipo pelúcia), por trás da peça lisa
+function fxFluff(c, raw, hex, r, shrink, mode, yStop = Infinity){
+  const w = c.width, h = c.height, pm = 1;
+  // corpo: encolhe a silhueta antes dos tufos, para o Peludo não ficar "gordo"
+  if(shrink){
+    const d0 = raw.getContext('2d').getImageData(0, 0, w, h).data; let x0 = w, y0 = h, x1 = 0, y1 = 0;
+    for(let y = 0; y < h; y += 2) for(let x = 0; x < w; x += 2) if(d0[(y*w + x)*4 + 3] > 40){ if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+    const k = document.createElement('canvas'); k.width = w; k.height = h; const kx = k.getContext('2d'), cx = (x0 + x1)/2, cy = (y0 + y1)/2;
+    kx.translate(cx, cy); kx.scale(shrink, shrink); kx.translate(-cx, -cy); kx.drawImage(raw, 0, 0); raw = k;
+  }
+  // tufos mais espaçados (1,5 × o raio) = recortes mais fundos entre eles, ondulação mais marcada
+  const a = raw.getContext('2d').getImageData(0, 0, w, h).data, pts = [], grid = new Set(), gap = r * 1.5;
+  const A = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? 0 : a[(y*w + x)*4 + 3];
+  for(let y = 2; y < Math.min(h-2, yStop - 4); y += 2) for(let x = 2; x < w-2; x += 2){
+    const i = (y*w + x)*4; if(a[i+3] < 160 || !fxIsPurple(a[i], a[i+1], a[i+2], pm)) continue;
+    if(A(x+3,y) > 20 && A(x-3,y) > 20 && A(x,y+3) > 20 && A(x,y-3) > 20) continue;
+    const gx = Math.floor(x/gap), gy = Math.floor(y/gap), k = gx + ',' + gy;
+    let near = false; for(let dx = -1; dx <= 1 && !near; dx++) for(let dy = -1; dy <= 1; dy++) if(grid.has((gx+dx) + ',' + (gy+dy))){ const q = pts.find(q => q[2] === (gx+dx) + ',' + (gy+dy)); if(q && Math.hypot(q[0]-x, q[1]-y) < gap){ near = true; break; } }
+    if(near) continue; grid.add(k); pts.push([x, y, k]);
+  }
+  // 1) silhueta = peça + tufos  2) pinta com a cor do corpo e sombra interna suave (como no Figma)
+  // 3) devolve por cima só os detalhes que não são pelo (garras, sapatos, risquinhos dos dedos)
+  const base = [1,3,5].map(i => parseInt(hex.slice(i, i+2), 16)), dark = base.map(v => Math.round(v*.8));
+  const mk = () => { const k = document.createElement('canvas'); k.width = w; k.height = h; return k; };
+  const U = mk(), ux = U.getContext('2d'); ux.drawImage(raw, 0, 0);
+  pts.forEach(([px, py]) => { ux.beginPath(); ux.arc(px, py, r, 0, Math.PI*2); ux.fill(); });
+  const R = mk(), rx = R.getContext('2d'); rx.drawImage(U, 0, 0); rx.globalCompositeOperation = 'source-in'; rx.fillStyle = `rgb(${base.join(',')})`; rx.fillRect(0, 0, w, h);
+  // volume (sombra interna + brilho) sem ctx.filter, que o Safari não suporta:
+  // o desfoque é feito reduzindo a silhueta e ampliando de volta com suavização
+  const sc = Math.max(4, Math.round(r*.45)), Sm = document.createElement('canvas'); Sm.width = Math.ceil(w/sc); Sm.height = Math.ceil(h/sc);
+  const smx = Sm.getContext('2d'); smx.imageSmoothingQuality = 'high'; smx.drawImage(U, 0, 0, Sm.width, Sm.height);
+  const B = mk(), bx = B.getContext('2d'); bx.imageSmoothingQuality = 'high'; bx.drawImage(Sm, 0, 0, w, h);
+  const edge = (color, dx, dy, alpha) => {
+    const O = mk(), ox = O.getContext('2d'); ox.fillStyle = color; ox.fillRect(0, 0, w, h);
+    ox.globalCompositeOperation = 'destination-out'; ox.drawImage(B, dx, dy); ox.drawImage(B, dx, dy);
+    rx.globalCompositeOperation = 'source-atop'; rx.globalAlpha = alpha; rx.drawImage(O, 0, 0); rx.globalAlpha = 1; fxFree(O);
+  };
+  edge(`rgb(${dark.join(',')})`, -r*.3, -r*.45, .9);                                                   // sombra embaixo/direita
+  edge(`rgb(${base.map(v => Math.round(v + (255 - v)*.35)).join(',')})`, r*.2, r*.3, .35);            // brilho em cima/esquerda
+  fxFree(Sm, B);
+  const D = mk(), dx = D.getContext('2d'); dx.drawImage(c, 0, 0); const dd = dx.getImageData(0, 0, w, h), q = dd.data;
+  for(let i = 0, lim = Math.min(q.length, yStop * w * 4); i < lim; i += 4){ if(a[i+3] && fxIsPurple(a[i], a[i+1], a[i+2], pm) && (r >= 15 || fxHsl(a[i], a[i+1], a[i+2])[2] > .58)) q[i+3] = 0; }   // no corpo (r grande) não há detalhes: sai todo o roxo
+  dx.putImageData(dd, 0, 0);
+  const x = c.getContext('2d'); x.clearRect(0, 0, w, h); x.drawImage(R, 0, 0); if(r < 15) x.drawImage(D, 0, 0);
+  fxFree(U, R, D, shrink ? raw : null);   // (O já é liberado dentro de edge)   // libera a memória dos canvas temporários (o Safari tem limite baixo)
+}
+function fxPiece(sheet, i, sx, sy, sw, sh, mode, hex, extra = {}){
+  const key = [sheet, i, sx, sy, sw, sh, mode ? hex : '', extra.fluff || '', extra.ink ? 'w' : '', extra.boot ? 'b' : ''].join('|');
+  if(FX_CACHE.has(key)){ const hit = FX_CACHE.get(key); FX_CACHE.delete(key); FX_CACHE.set(key, hit); return hit; }   // LRU
+  const [cw, ch, C] = FX_SHEETS[sheet], ox = (i % C) * cw + 60, oy = Math.floor(i / C) * ch + 60;
+  const c = document.createElement('canvas'); c.width = Math.ceil(sw); c.height = Math.ceil(sh);
+  if(FX_IMG[sheet]) c.getContext('2d').drawImage(FX_IMG[sheet], ox + sx, oy + sy, sw, sh, 0, 0, sw, sh);
+  let raw = null;
+  try{
+    // cópia original (roxa) para achar o contorno. Desenha direto do sprite, e não do canvas `c`:
+    // no Safari a cópia canvas→canvas pode sair depois da troca de cor, e aí os tufos sumiam nas cores não roxas
+    if(extra.fluff){ raw = document.createElement('canvas'); raw.width = c.width; raw.height = c.height; if(FX_IMG[sheet]) raw.getContext('2d').drawImage(FX_IMG[sheet], ox + sx, oy + sy, sw, sh, 0, 0, sw, sh); }
+    // Bota roxa: a bota usa o mesmo roxo do corpo; acha a faixa lilás (#9c84f6) do cano e não mexe de lá para baixo
+    let yStop = Infinity;
+    if(extra.boot){ const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+      for(let i = 0; i < d.length; i += 4){ if(d[i+3] > 200 && Math.abs(d[i]-156) < 10 && Math.abs(d[i+1]-132) < 10 && Math.abs(d[i+2]-246) < 10){ yStop = Math.floor(i/4/c.width); break; } } }
+    if(mode && hex.toLowerCase() !== '#7b5cf0') fxRecolor(c, hex, mode, yStop);
+    if(extra.ink) fxWhiteInk(c);
+    if(extra.fluff) fxFluff(c, raw, hex, extra.fluff, extra.shrink, mode, yStop);
+  }catch(e){ console.warn('Fuxo: falha ao montar peça', sheet, i, e); }
+  if(extra.fluff) fxFree(raw);
+  FX_CACHE.set(key, c);
+  // cache limitado: no Safari a memória de canvas estoura rápido e as peças novas saíam sem os tufos
+  while(FX_CACHE.size > 70){ const k = FX_CACHE.keys().next().value; fxFree(FX_CACHE.get(k)); FX_CACHE.delete(k); }
+  return c;
+}
+// Peludo = desenho Liso + tufos arredondados (fxFluff); por isso usa os encaixes do Liso
+const fxEst = m => m.estilo === 'Peludo' ? 0 : Math.max(0, FX_ESTILOS.indexOf(m.estilo));
+const fxFluffy = m => m.estilo === 'Peludo';
+const fxBody = m => FX_FORMATOS.indexOf(m.formato) * 4 + fxEst(m);
+const fxSlots = m => FX_SLOTS[fxBody(m)] || FX_SLOTS[16];
+const FX_BODY_W = {'Redondo':250, 'Quadrado':250, 'Retângulo':170, 'Triângulo':250, 'Fantasma':230, 'Fantasma liso':230};
+function fxEyeIdx(m){
+  const one = m.q === 'Um olho', a = FX_EXP_A.indexOf(m.exp);
+  if(a >= 0) return a + (one ? 20 : 0);
+  return Math.max(0, FX_EXP_B.indexOf(m.exp)) + (one ? 49 : 40);
+}
+// linha de baixo da aba de cada chapéu (último pixel visível), em coordenadas do chapéu
+const FX_BRIM = {};
+function fxHatBrim(i, hex){
+  if(FX_BRIM[i] != null) return FX_BRIM[i];
+  const c = fxPiece('chapeus', i, 0, 0, 180, 120, 0, hex), d = c.getContext('2d').getImageData(0, 0, 180, 120).data;
+  let y = 119; for(; y > 0; y--){ let hit = false; for(let x = 0; x < 180; x++) if(d[(y*180 + x)*4 + 3] > 140){ hit = true; break; } if(hit) break; }
+  return FX_BRIM[i] = y;
+}
+const fxAcc = (m, k) => m[k] ? FX_ACC[k].opts.find(o => o[0] === m[k]) : null;
+// ordem das camadas igual à do componente "Monstro" no Figma (asas atrás, chapéu na frente)
+function fxDraw(ctx, m, only){
+  const has = k => !only || only.includes(k), hex = fxHex(m), M = 45, ei = fxEst(m), fl = fxFluffy(m);
+  const bw = (FX_BODY_W[m.formato] || 230) + (fl ? 22 : 0);   // largura visível do corpo: asas e capa acompanham
+  const [asY, caY, cdX, cbY, brX, brY, brR, peX, peR, roY, pcY, ocY, chY] = fxSlots(m);
+  const put = (sheet, i, x, y, w2, h2, mode, extra) => {
+    const [, , , w, h] = FX_SHEETS[sheet], kx = w2 / w, ky = h2 / h;
+    ctx.drawImage(fxPiece(sheet, i, -M, -M, w + 2*M, h + 2*M, mode, hex, extra), x - M*kx, y - M*ky, (w + 2*M)*kx, (h + 2*M)*ky);
+  };
+  // braços e pernas vêm em par: cada lado é encaixado separado, como no Figma
+  const pair = (sheet, i, x, y, R, mode = 1, fr = 0, boot = false) => {
+    const ex = {...(fr ? {fluff: fr} : {}), ...(boot ? {boot: true} : {})};
+    ctx.drawImage(fxPiece(sheet, i, -M, -M, 150 + M, 160 + 2*M, mode, hex, ex), x - M, y - M);
+    ctx.drawImage(fxPiece(sheet, i, 150, -M, 150 + M, 160 + 2*M, mode, hex, ex), x + R - 30, y - M);
+  };
+  let o;
+  // asas: largura = corpo + 175 (proporção do Fantasma no Figma); a de morcego desce para nascer nas costas
+  if(has('asas') && (o = fxAcc(m, 'asas'))){
+    if(o[0] === 'Fada'){
+      // asa de fada: as asas de baixo ficam perto do centro e sumiam atrás do corpo.
+      // separa as duas metades e encaixa cada uma na lateral do corpo
+      const k = 1.35, p = fxPiece('asas', o[1], -M, -M, 300 + 2*M, 140 + 2*M, o[2], hex), hw = (150 + M), d = (m.formato === 'Triângulo' ? 160 + (fl ? 22 : 0) : bw)/2 - 18,   /* triângulo: largura do corpo na altura das asas */ y = asY + 6 - M*k;
+      ctx.drawImage(p, 0, 0, hw, p.height, 200 - hw*k - d, y, hw*k, p.height*k);
+      ctx.drawImage(p, hw, 0, hw, p.height, 200 + d, y, hw*k, p.height*k);
+    } else { const w = bw + 175, h = 189 * w / 405; put('asas', o[1], 200 - w/2, asY + (o[0] === 'Morcego' ? 34 : 6) - (h - 189)/2, w, h, o[2]); }
+  }
+  // capa: largura = corpo + 90 (sobra igual dos dois lados em qualquer formato)
+  if(has('capa') && (o = fxAcc(m, 'capa'))){ const w = bw + 90; put('capas', o[1], 200 - w/2, caY, w, 260, o[2]); }
+  if(has('cauda') && (o = fxAcc(m, 'cauda'))) put('caudas', o[1], cdX, 210, 120, 120, o[2]);
+  if(has('cabeca') && (o = fxAcc(m, 'cabeca'))) put('cabeca', o[1], 100, cbY, 200, 130, o[2]);
+  if(has('bracos')) pair('bracos', ei*8 + (m.braco === 'Longo' ? 4 : 0) + Math.max(0, FX_MAOS.indexOf(m.mao)), brX, brY, brR, 1, fl ? 10 : 0);
+  // pernas no mesmo afastamento em todos os formatos (o do Redondo: 91 / 98).
+  // Peludo: os tufos engordam cada perna ~11px, então afasta esse tanto para o vão visível ficar igual
+  const lg = fl ? 11 : (m.estilo === 'Espinhos' || m.estilo === 'Felpudo') ? 7 : 0;   // Espinhos e Felpudo: as pontas dos pés também se encostavam
+  if(has('pernas')) pair('pernas', Math.max(0, FX_CALCADOS.indexOf(m.calcado))*8 + (m.perna === 'Longa' ? 4 : 0) + ei, 91 - lg, 342, 98 + lg*2, 1, fl ? 11 : 0, m.calcado === 'Bota roxa');
+  if(has('corpo')){
+    // Triângulo + chapéu: a ponta do corpo entra no chapéu (corta o que passaria por cima da aba)
+    const hat = m.formato === 'Triângulo' && (!only || only.includes('chapeu')) ? fxAcc(m, 'chapeu') : null;
+    if(hat && hat[0] !== 'Faixa esportiva'){ ctx.save(); ctx.beginPath(); ctx.rect(-200, chY + fxHatBrim(hat[1], hex) - 6, 800, 900); ctx.clip(); }
+    ctx.drawImage(fxPiece('corpo', fxBody(m), 0, 0, 400, 520, 1, hex, fl ? {fluff: 18, shrink: .88} : {}), 0, 0);
+    if(hat && hat[0] !== 'Faixa esportiva') ctx.restore();
+  }
+  if(has('olhos')) put('olhos', fxEyeIdx(m), 120, roY, 160, 120, 1);
+  if(has('boca')) put('boca', Math.max(0, FX_BOCAS.indexOf(m.boca)), 120, roY, 160, 120, 0, m.cor === 'Marinho' ? {ink: true} : {});
+  // pescoço: estica na horizontal até as bordas do corpo na altura da faixa (cada formato/estilo tem largura diferente)
+  // (gravata, gravata borboleta e corrente não envolvem o pescoço: ficam no tamanho original)
+  if(has('pescoco') && (o = fxAcc(m, 'pescoco')) && ['Gravata','Gravata borboleta','Corrente de ouro'].includes(o[0])) put('pescoco', o[1], 100, pcY, 200, 110, o[2]);
+  else if(has('pescoco') && o){
+    const [nl, nr, ny] = fxNeckBand(o[1]), [bl, br] = fxBodyRow(m, hex, fl, Math.round(pcY + ny));
+    if(br > bl){
+      const kx = (br - bl + 2) / (nr - nl), x0 = bl - 1 - nl*kx, p = fxPiece('pescoco', o[1], -M, -M, 200 + 2*M, 110 + 2*M, o[2], hex);
+      ctx.drawImage(p, x0 - M*kx, pcY - M, (200 + 2*M)*kx, 110 + 2*M);
+    } else put('pescoco', o[1], 100, pcY, 200, 110, o[2]);
+  }
+  if(has('oculos') && (o = fxAcc(m, 'oculos'))) put('oculos', o[1], 120, ocY, 160, 60, o[2]);
+  if(has('chapeu') && (o = fxAcc(m, 'chapeu'))) put('chapeus', o[1], 110, chY, 180, 120, o[2]);
+}
+// faixa do acessório de pescoço: extensão horizontal das primeiras linhas visíveis (a parte que envolve o pescoço)
+const FX_NECK = {}, FX_ROW = {};
+function fxNeckBand(i){
+  if(FX_NECK[i]) return FX_NECK[i];
+  // usa a linha mais larga da peça (a faixa que envolve o pescoço); o nó do lenço, acima dela, não conta
+  const c = fxPiece('pescoco', i, 0, 0, 200, 110, 0, '#7b5cf0'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, W = c.width;
+  let best = [0, 200, 10, 0];
+  for(let y = 0; y < c.height; y++){ let l = -1, r = -1; for(let x = 0; x < W; x++) if(d[(y*W + x)*4 + 3] > 60){ if(l < 0) l = x; r = x + 1; } if(l >= 0 && r - l > best[3]) best = [l, r, y, r - l]; }
+  return FX_NECK[i] = best.slice(0, 3);
+}
+// bordas do corpo numa linha (coordenadas do Figma, 400 × 520)
+function fxBodyRow(m, hex, fl, y){
+  const key = fxBody(m) + '|' + fl + '|' + y; if(FX_ROW[key]) return FX_ROW[key];
+  const c = fxPiece('corpo', fxBody(m), 0, 0, 400, 520, 1, hex, fl ? {fluff: 18, shrink: .88} : {});
+  const d = c.getContext('2d').getImageData(0, y, c.width, 1).data; let l = -1, r = -1;
+  for(let x = 0; x < c.width; x++) if(d[x*4 + 3] > 120){ if(l < 0) l = x; r = x + 1; }
+  return FX_ROW[key] = [l, r];
+}
+// desenha o monstrinho num <canvas>, enquadrando o retângulo `crop` (coordenadas do Figma, 400 × 520)
+function fxRender(cv, m, opt = {}){
+  const crop = opt.crop || [-10, 0, 420, 520], dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || opt.w || 100, h = cv.clientHeight || opt.h || 100;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const ctx = cv.getContext('2d'), s = Math.min(cv.width / crop[2], cv.height / crop[3]);
+  ctx.setTransform(s, 0, 0, s, (cv.width - crop[2]*s)/2 - crop[0]*s, (cv.height - crop[3]*s)/2 - crop[1]*s);
+  ctx.imageSmoothingQuality = 'high';
+  fxDraw(ctx, m, opt.only);
+}
+// avatar: enquadra sempre o rosto (centro dos olhos), não importa a altura do corpo
+const fxAvatarCrop = m => { const roY = fxSlots(m)[9]; return [200 - 125, roY + 58 - 112, 250, 250]; };
+// caixa visível do Fuxo inteiro (coordenadas do Figma), para centralizar no palco
+let fxBoxKey = '', fxBoxVal = null;
+function fxBBox(m, only){
+  const key = JSON.stringify(m) + (only || ''); if(key === fxBoxKey) return fxBoxVal;
+  const P = 160, c = document.createElement('canvas'); c.width = 400 + P*2; c.height = 520 + P*2;
+  const x = c.getContext('2d'); x.translate(P, P); fxDraw(x, m, only);
+  const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+  for(let y = 0; y < c.height; y += 2) for(let xx = 0; xx < c.width; xx += 2) if(d[(y*c.width + xx)*4 + 3] > 30){ if(xx < x0) x0 = xx; if(xx > x1) x1 = xx; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+  fxFree(c);
+  fxBoxKey = key; fxBoxVal = x1 < x0 ? [0, 0, 400, 520] : [x0 - P, y0 - P, x1 - x0, y1 - y0];
+  return fxBoxVal;
+}
+function fxPaintAvatar(){
+  const cv = document.querySelector('#avatar canvas'); if(!cv) return;
+  fxLoad().then(() => { fxRender(cv, S.fuxo, {crop: fxAvatarCrop(S.fuxo), w:52, h:52}); cv.closest('.avatar').classList.add('has-fx'); });
+}
+
+/* ================= Fuxo: tela de personalização ================= */
+let fxDraft = null, fxTab = 'corpo', fxAccTab = 'chapeu', fxRostoTab = 'olhos', fxReturn = null;
+const fxStageNeed = id => id ? !(S.testMode || stageDone(id)) : false;   // true = bloqueado
+const fxTabLocked = id => id === 'acessorios' ? Object.values(FX_ACC).every(a => fxStageNeed(a.need)) : fxStageNeed((FX_TABS.find(t => t[0] === id) || [])[3]);
+const fxSlotName = id => (SLOTS.find(s => s.id === id) || {}).short || '';
+function fxLockCard(need){
+  const acts = actsOf(need), n = acts.filter(a => S.done[a.id]).length;
+  return `<div class="fx-lock"><span class="fx-lock-ic">${lu('lock', 2.2)}</span><p><b>Libera quando você concluir: ${esc(fxSlotName(need))}</b><span>${n} de ${acts.length} atividades feitas</span></p></div>`;
+}
+// recortes usados nas miniaturas de cada categoria
+function fxThumb(cat, m){
+  const [asY, caY, cdX, cbY, brX, brY, , peX, , roY, pcY, ocY, chY] = fxSlots(m);
+  const face = ['corpo','olhos','boca'];
+  return {
+    formato: {crop:[60, 110, 280, 290], only:face},
+    exp:     {crop:[125, roY + 12, 150, 120], only:['corpo','olhos']},
+    boca:    {crop:[125, roY + 12, 150, 120], only:face},
+    mao:     {crop:[brX - 12, brY - 8, 175, 175], only:['bracos','corpo']},
+    calcado: {crop:[peX - 12, 372, 280, 136], only:['pernas','corpo']},
+    chapeu:  {crop:[70, chY - 20, 260, 220], only:['chapeu', ...face]},
+    cauda:   {crop:[130, 150, 290, 250], only:['cauda','corpo']},
+    oculos:  {crop:[95, ocY - 45, 210, 150], only:['oculos', ...face]},
+    cabeca:  {crop:[70, cbY - 10, 260, 220], only:['cabeca', ...face]},
+    pescoco: {crop:[75, pcY - 50, 250, 190], only:['pescoco', ...face]},
+    asas:    {crop:[-10, asY - 20, 420, 300], only:['asas', ...face]},
+    capa:    {crop:[15, caY - 60, 370, 380], only:['capa', ...face]},
+  }[cat];
+}
+const fxSeg = (key, opts, label) => `<div class="fx-seg" role="radiogroup" aria-label="${label}">${opts.map(o => `<button role="radio" data-fk="${key}" data-fv="${esc(o)}" aria-checked="${fxDraft[key] === o}">${esc(o)}</button>`).join('')}</div>`;
+// tile = poço claro com a peça desenhada; o rótulo vai embaixo só onde o desenho sozinho não basta
+function fxTiles(key, values, thumb, {labels = false, cols = 4, locked = false, none = false} = {}){
+  let h = `<div class="fx-grid c${cols}" role="radiogroup">`;
+  if(none) h += `<button class="fx-tile" role="radio" data-fk="${key}" data-fv="" aria-checked="${!fxDraft[key]}" aria-label="Sem ${FX_ACC[key].label.toLowerCase()}" ${locked ? 'aria-disabled="true"' : ''}><span class="fx-well fx-none">${lu('ban', 2)}</span>${labels ? '<span>Nenhum</span>' : ''}</button>`;
+  values.forEach(v => {
+    const on = fxDraft[key] === v;
+    h += `<button class="fx-tile" role="radio" data-fk="${key}" data-fv="${esc(v)}" aria-checked="${on}" aria-label="${esc(v)}" title="${esc(v)}" ${locked ? 'aria-disabled="true"' : ''}>
+      <span class="fx-well"><canvas data-thumb="${thumb}" data-tv="${esc(v)}"></canvas>${on ? `<span class="fx-ok">${lu('check', 3)}</span>` : ''}</span>${labels ? `<span>${esc(v)}</span>` : ''}</button>`;
+  });
+  return h + '</div>';
+}
+function fxPanel(){
+  const t = fxTab, locked = fxTabLocked(t);
+  let h = '';
+  if(t === 'corpo'){
+    h += `<h2 class="fx-h">Formato</h2>` + fxSeg('estilo', FX_ESTILOS, 'Textura') + `<div class="fx-gap"></div>` + fxTiles('formato', FX_FORMATOS, 'formato', {labels:true, cols:3});
+  } else if(t === 'cor'){
+    h += `<h2 class="fx-h">Cor do corpo</h2><div class="fx-sw" role="radiogroup" aria-label="Cor do corpo">${FX_CORES.map(([n, c]) => `<button role="radio" data-fk="cor" data-fv="${n}" aria-checked="${fxDraft.cor === n}"><span class="dot" style="background:${c}"></span><span>${n}</span></button>`).join('')}</div>`;
+  } else if(t === 'rosto'){
+    if(locked) h += fxLockCard('s0');
+    // Olhos e Boca em pílulas, no mesmo padrão de Acessórios
+    h += `<div class="fx-chips" role="tablist" aria-label="Parte do rosto">${[['olhos','Olhos'],['boca','Boca']].map(([k, l]) => `<button class="fx-chip" role="tab" data-rosto="${k}" aria-selected="${fxRostoTab === k}">${l}</button>`).join('')}</div><div class="fx-gap"></div>`;
+    h += fxRostoTab === 'olhos'
+      ? fxSeg('q', ['Dois olhos', 'Um olho'], 'Quantidade de olhos') + `<div class="fx-gap"></div>` + fxTiles('exp', FX_EXP, 'exp', {locked})
+      : fxTiles('boca', FX_BOCAS, 'boca', {locked});
+  } else if(t === 'bracos'){
+    if(locked) h += fxLockCard('s1');
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('braco', ['Curto', 'Longo'], 'Tamanho dos braços');
+    h += `<h2 class="fx-h">Mão</h2>` + fxTiles('mao', FX_MAOS, 'mao', {labels:true, cols:4, locked});
+  } else if(t === 'pernas'){
+    if(locked) h += fxLockCard('s1');
+    h += `<h2 class="fx-h">Tamanho</h2>` + fxSeg('perna', ['Curta', 'Longa'], 'Tamanho das pernas');
+    h += `<h2 class="fx-h">Calçado</h2>` + fxTiles('calcado', FX_CALCADOS, 'calcado', {labels:true, cols:3, locked});
+  } else {
+    h += `<div class="fx-chips" role="tablist" aria-label="Tipo de acessório">${Object.entries(FX_ACC).map(([k, a]) => {
+      const lk = fxStageNeed(a.need);
+      return `<button class="fx-chip" role="tab" data-acc="${k}" aria-selected="${fxAccTab === k}">${lk ? lu('lock', 2.4) : ''}${a.label}${fxDraft[k] && !lk ? '<span class="on" aria-label="em uso"></span>' : ''}${fxIsNew(k) ? '<span class="fx-new">Novo</span>' : ''}</button>`;
+    }).join('')}</div>`;
+    const a = FX_ACC[fxAccTab], lk = fxStageNeed(a.need);
+    if(lk) h += fxLockCard(a.need);
+    h += `<h2 class="fx-h">${a.label}</h2>` + fxTiles(fxAccTab, a.opts.map(o => o[0]), fxAccTab, {locked:lk, none:true, cols:4});
+  }
+  return h;
+}
+// sombra no chão: fica logo abaixo do ponto mais baixo do personagem e tem a largura dos pés
+function fxShadow(cv){
+  const x = cv.getContext('2d'), W = cv.width, H = cv.height, d = x.getImageData(0, 0, W, H).data;
+  let bottom = -1; for(let y = H-1; y >= 0 && bottom < 0; y--) for(let i = y*W*4 + 3, e = i + W*4; i < e; i += 4) if(d[i] > 60){ bottom = y; break; }
+  if(bottom < 0) return;
+  let minX = W, maxX = 0; for(let y = Math.max(0, bottom - Math.round(H*.06)); y <= bottom; y++) for(let px = 0; px < W; px++) if(d[(y*W + px)*4 + 3] > 60){ if(px < minX) minX = px; if(px > maxX) maxX = px; }
+  const cx = (minX + maxX)/2, rx = Math.max(W*.12, (maxX - minX)*.62), ry = Math.max(4, H*.028), cy = Math.min(H - ry, bottom + ry*.35);
+  x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-over';
+  x.translate(cx, cy); x.scale(1, ry/rx); const g = x.createRadialGradient(0, 0, 0, 0, 0, rx);
+  g.addColorStop(0, 'rgba(29,32,72,.24)'); g.addColorStop(1, 'rgba(29,32,72,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, rx, 0, Math.PI*2); x.fill(); x.restore();
+}
+// palco: escala fixa (o Fuxo não "pula" de tamanho), mas o enquadramento acompanha o centro do personagem;
+// se ele ficar maior que o palco (asas, chapéu alto, perna longa), a câmera abre para caber
+function fxPaintStage(){
+  const cv = $('#fx-stage-cv'), [bx, by, bw, bh] = fxBBox(fxDraft), base = [420, 470], pad = 28;
+  const cw = Math.max(base[0], bw + pad*2), ch = Math.max(base[1], bh + pad*2) ;
+  const sh = 14;   // espaço para a sombra no chão
+  fxRender(cv, fxDraft, {crop: [bx + bw/2 - cw/2, by + bh/2 - ch/2 + sh/2, cw, ch]});
+  try{ fxShadow(cv); }catch(e){}
+}
+// miniatura só da peça (sem o personagem): enquadra o desenho pelo que tem de visível,
+// com um tamanho mínimo por categoria para as peças pequenas (ex.: bocas) não ficarem gigantes
+const FX_BOX = {};
+function fxRenderPiece(cv, sheet, i, mode, hex, minW, minH){
+  const [, , , w, h] = FX_SHEETS[sheet], M = 45, p = fxPiece(sheet, i, -M, -M, w + 2*M, h + 2*M, mode, hex), key = sheet + '|' + i;
+  if(!FX_BOX[key]){
+    const d = p.getContext('2d').getImageData(0, 0, p.width, p.height).data; let x0 = p.width, y0 = p.height, x1 = 0, y1 = 0;
+    for(let y = 0; y < p.height; y++) for(let x = 0; x < p.width; x++) if(d[(y*p.width + x)*4 + 3] > 24){ if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+    FX_BOX[key] = x1 < x0 ? [0, 0, p.width, p.height] : [x0, y0, x1 - x0 + 1, y1 - y0 + 1];
+  }
+  let [bx, by, bw, bh] = FX_BOX[key];
+  if(bw < minW){ bx -= (minW - bw)/2; bw = minW; } if(bh < minH){ by -= (minH - bh)/2; bh = minH; }
+  const pad = Math.max(bw, bh) * .1; bx -= pad; by -= pad; bw += pad*2; bh += pad*2;   // respiro para não encostar na borda do quadradinho
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), W = cv.clientWidth || 70, H = cv.clientHeight || 70;
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  const ctx = cv.getContext('2d'), s = Math.min(cv.width/bw, cv.height/bh);
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(p, bx, by, bw, bh, (cv.width - bw*s)/2, (cv.height - bh*s)/2, bw*s, bh*s);
+}
+function fxPaintThumbs(){
+  $('#fx-panel').querySelectorAll('canvas[data-thumb]').forEach(cv => {
+    const cat = cv.dataset.thumb, key = {formato:'formato', exp:'exp', boca:'boca', mao:'mao', calcado:'calcado'}[cat] || cat;
+    const m = {...fxDraft, [key]: cv.dataset.tv}, hex = fxHex(m);
+    if(cat === 'exp') return fxRenderPiece(cv, 'olhos', fxEyeIdx(m), 1, hex, 110, 80);
+    if(cat === 'boca') return fxRenderPiece(cv, 'boca', Math.max(0, FX_BOCAS.indexOf(m.boca)), 0, hex, 80, 80);
+    if(FX_ACC[cat]){ const o = fxAcc(m, cat); if(o) return fxRenderPiece(cv, FX_ACC[cat].sheet, o[1], o[2], hex, 90, 90); }
+    fxRender(cv, m, fxThumb(cat, m));
+  });
+}
+function fxRenderAll(keepScroll){
+  const p = $('#fx-panel'), y = p.scrollTop, cx = p.querySelector('.fx-chips')?.scrollLeft || 0;
+  // abrir a aba (ou a pílula do acessório) conta como "visto": o destaque some
+  if(fxTab === 'acessorios') fxSeen(fxAccTab); else fxSeen(fxTab);
+  $('#fx-cats').innerHTML = FX_TABS.map(([id, label, icon]) => `<button class="fx-cat" role="tab" id="fxtab-${id}" data-fxtab="${id}" aria-selected="${fxTab === id}" aria-controls="fx-panel"><span class="ic">${lu(icon, 2)}</span>${fxTabLocked(id) ? `<span class="lk" aria-label="bloqueado">${lu('lock', 2.4)}</span>` : ''}${(id === 'acessorios' ? fxAccNew().length : fxIsNew(id)) ? '<span class="nw" aria-label="novo"></span>' : ''}<span>${label}</span></button>`).join('');
+  p.querySelectorAll('canvas').forEach(c => fxFree(c));
+  p.innerHTML = fxPanel(); p.setAttribute('aria-labelledby', 'fxtab-' + fxTab);
+  if(keepScroll) p.scrollTop = y; else p.scrollTop = 0;
+  // as pílulas (Acessórios / Olhos e Boca) são recriadas a cada toque: mantém a posição da rolagem horizontal
+  const chips = p.querySelector('.fx-chips');
+  if(chips){ if(keepScroll) chips.scrollLeft = cx; else chips.querySelector('[aria-selected="true"]')?.scrollIntoView({inline:'center', block:'nearest'}); }
+  fxLoad().then(() => { if(!fxDraft) return; fxPaintStage(); fxPaintThumbs(); });
+}
+function openEditor(tab){
+  fxReturn = document.activeElement; fxDraft = {...S.fuxo}; fxTab = typeof tab === 'string' ? tab : 'corpo';
+  // em Acessórios, começa pela pílula do acessório recém-liberado
+  const firstAcc = fxAccNew()[0] || Object.keys(FX_ACC).find(k => !fxStageNeed(FX_ACC[k].need)); fxAccTab = firstAcc || 'chapeu';
+  if(!$('#fuxo .trail-bg .blob')) $('#fuxo .trail-bg').insertAdjacentHTML('afterbegin', BLOBS);
+  $('#fuxo').hidden = false; $('#fx-discard').hidden = true; $('#fx-hint').textContent = '';
+  fxRenderAll(); $('#fx-back').focus();
+}
+function closeFuxo(){ $('#fuxo').hidden = true; fxDraft = null; if(fxReturn && document.contains(fxReturn)) fxReturn.focus(); }
+const fxChanged = () => fxDraft && JSON.stringify(fxDraft) !== JSON.stringify(S.fuxo);
+$('#fx-cats').addEventListener('click', e => { const b = e.target.closest('[data-fxtab]'); if(!b) return; fxTab = b.dataset.fxtab; fxRenderAll(); $('#fxtab-' + fxTab).focus(); });
+$('#fx-cats').addEventListener('keydown', e => {
+  if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  const i = FX_TABS.findIndex(t => t[0] === fxTab), n = (i + (e.key === 'ArrowRight' ? 1 : -1) + FX_TABS.length) % FX_TABS.length;
+  fxTab = FX_TABS[n][0]; fxRenderAll(); $('#fxtab-' + fxTab).focus();
+});
+$('#fx-panel').addEventListener('click', e => {
+  const rc = e.target.closest('[data-rosto]');
+  if(rc){ fxRostoTab = rc.dataset.rosto; fxRenderAll(true); $(`#fx-panel [data-rosto="${fxRostoTab}"]`).focus(); return; }
+  const chip = e.target.closest('[data-acc]');
+  if(chip){ fxAccTab = chip.dataset.acc; fxRenderAll(true); $(`#fx-panel [data-acc="${fxAccTab}"]`).focus(); return; }
+  const b = e.target.closest('[data-fk]'); if(!b) return;
+  if(b.getAttribute('aria-disabled') === 'true'){
+    const need = fxTab === 'acessorios' ? FX_ACC[fxAccTab].need : FX_TABS.find(t => t[0] === fxTab)[3];
+    toast(`Conclua as atividades de ${fxSlotName(need)} para liberar`); return;
+  }
+  const k = b.dataset.fk, v = b.dataset.fv || null;
+  if(fxDraft[k] === v) return;
+  fxDraft[k] = v;
+  $('#fx-hint').textContent = `${v || 'Nenhum'} selecionado.`;
+  fxRenderAll(true);
+  $(`#fx-panel [data-fk="${k}"][data-fv="${CSS.escape(v || '')}"]`)?.focus();
+});
+$('#fx-save').onclick = () => { const c = fxChanged(); S.fuxo = {...fxDraft}; save(); closeFuxo(); renderTrilha(); if(c) toast('Fuxo atualizado'); };
+// exportação ainda em definição: por enquanto só avisa
+// exportar: só o Fuxo, grande, atrás do overlay do template (frame "apenas o fuxo" do Figma)
+$('#fx-export').onclick = async () => {
+  const btn = $('#fx-export'); if(btn.dataset.busy) return; btn.dataset.busy = '1';
+  try{
+    await fxLoad();
+    const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; const ctx = c.getContext('2d');
+    // fundo: mesmo degradê do palco do editor (radial 70% 60% at 50% 42%: branco → lilás claro)
+    ctx.save(); ctx.translate(540, 1920*.42); ctx.scale(1080*.7, 1920*.6);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1); g.addColorStop(0, '#FFFFFF'); g.addColorStop(.55, '#F1ECFD'); g.addColorStop(1, '#E2D8FA');
+    ctx.fillStyle = g; ctx.fillRect(-2, -2, 4, 4); ctx.restore();
+    // Fuxo na posição do Monstrinho do frame "apenas o fuxo" (x -145.23, y 76, 400×520 → 1371.25×1782.63)
+    ctx.save(); ctx.translate(-145.23, 76); ctx.scale(3.428125, 3.428125); fxDraw(ctx, fxDraft || S.fuxo); ctx.restore();
+    const tpl = await new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'assets/story-fuxo.png?v=2'; });
+    if(tpl) ctx.drawImage(tpl, 0, 0, 1080, 1920);
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    if(!blob){ toast('Não foi possível gerar a imagem. Tente de novo.'); return; }
+    const file = new File([blob], 'meu-fuxo.png', {type: 'image/png'});
+    try{ if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'Meu Fuxo · Esquenta Detach!'}); return; } }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+    const dl = await getDownloads();
+    try{ if(dl){ await dl.save({filename: 'meu-fuxo.png', data: blob}); toast('Imagem salva'); return; } }catch(e){ if(e && e.code === 'declined') return; }
+    const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = 'meu-fuxo.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('Imagem salva');
+  } finally { delete btn.dataset.busy; }
+};
+$('#fx-back').onclick = () => { if(fxChanged()){ $('#fx-discard').hidden = false; $('#fx-discard-keep').focus(); } else closeFuxo(); };
+$('#fx-discard-keep').onclick = () => { $('#fx-discard').hidden = true; $('#fx-back').focus(); };
+$('#fx-discard-yes').onclick = closeFuxo;
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#fuxo').hidden){ e.stopPropagation(); $('#fx-discard').hidden ? $('#fx-back').click() : $('#fx-discard-keep').click(); } }, true);
+
+/* ================= poção do Detach: caldeirão → pote de abacaxi + cupom ================= */
+const couponHTML = c => `<div class="pot-coupon"><span class="pot-coupon-l">${esc(c.label)}</span>
+  <div class="pot-coupon-row"><code class="pot-code">${esc(c.code)}</code><button class="pot-copy" data-copy="${esc(c.code)}">${lu('copy', 2.2)}<span>Copiar</span></button></div>
+  <span class="sr-only" role="status" aria-live="polite"></span></div>`;
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-copy]'); if(!b) return;
+  let ok = false;
+  try{ await navigator.clipboard.writeText(b.dataset.copy); ok = true; }
+  catch(err){ const t = document.createElement('textarea'); t.value = b.dataset.copy; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); try{ ok = document.execCommand('copy'); }catch(e2){} t.remove(); }
+  const l = b.querySelector('span'), st = b.closest('.pot-coupon').querySelector('[role="status"]');
+  l.textContent = ok ? 'Copiado!' : 'Selecione e copie'; b.classList.toggle('ok', ok); st.textContent = ok ? 'Código copiado' : '';
+  if(!ok){ const r = document.createRange(); r.selectNodeContents(b.parentElement.querySelector('.pot-code')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+  clearTimeout(b._t); b._t = setTimeout(() => { l.textContent = 'Copiar'; b.classList.remove('ok'); }, 2200);
+});
+// caldeirão 2D no estilo dos stickers do evento (abacaxi): boca redonda em perspectiva,
+// contorno branco grosso que envolve tudo e rastro glitch à direita em faixas de comprimentos irregulares (roxo → magenta → laranja)
+function potCauldron(){ return `<img class="pot-cauldron" src="assets/caldeirao.png" alt="">`; }
+let potDone = null, potReturn = null;
+function showPotion(a, then){
+  potDone = then || null; potReturn = document.activeElement;
+  const picks = (S.data[a.id] || {}).v || [];
+  // ingredientes partem de pontos acima do caldeirão e caem dentro dele, um de cada vez
+  const from = [[-96, -70], [92, -78], [-6, -98]];
+  $('#pot-stage').innerHTML = `
+    <span class="rw-speed"></span><span class="rw-halo"></span>
+    ${rwOrn('pre', 9, 110, 96, 11)}
+    ${Array.from({length:6}, (_, i) => `<i class="pot-bub" style="--bx:${[-34,22,-8,40,-22,10][i]}px;--bt:${(1 + i*.28).toFixed(2)}s"></i>`).join('')}
+    ${potCauldron()}
+    <span class="pot-splash"></span>
+    ${picks.map((w, i) => `<span class="pot-word" style="--x0:${from[i % 3][0]}px;--y0:${from[i % 3][1]}px;--wt:${(.75 + i*.42).toFixed(2)}s">${esc(w)}</span>`).join('')}
+    <span class="rw-burst"></span><span class="rw-flash"></span>
+    ${Array.from({length:14}, (_, i) => `<i class="rw-conf" style="--a:${i*25.7}deg;--d:${130 + (i%4)*24}px;--r:${(i%2 ? 1 : -1)*(200 + i*30)}deg;background:${['#FF4B27','#D430A8','#8740E9','#FFC23D','#fff','#7FD3FF'][i%6]}"></i>`).join('')}
+    ${rwOrn('post', 13, 104, 112, 42, .24)}
+    <div class="rw-card"><img class="rw-ill" src="assets/pote.png" alt="Pote de poção em formato de abacaxi"></div>`;
+  $('#pot-text').textContent = picks.length ? picks.join(' + ') : '';
+  $('#pot-coupon').innerHTML = a.coupon ? couponHTML(a.coupon) : '';
+  const p = $('#pot'); p.hidden = false; p.classList.remove('out');
+  const body = $('#pot .pot-body'); body.classList.remove('brew'); void body.offsetWidth; body.classList.add('brew');
+  $('#pot-go').focus();
+}
+$('#pot-go').onclick = () => {
+  const p = $('#pot'); p.classList.add('out');
+  setTimeout(() => {
+    p.hidden = true; p.classList.remove('out');
+    if(potDone){ const f = potDone; potDone = null; f(); }
+    else if(potReturn && document.contains(potReturn)) potReturn.focus();
+  }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280);
+};
+
+/* ================= recompensa: momento concluído ================= */
+// motion inspirado no vídeo de referência: brilho em estrela → núcleo de luz → "gema" flutuando em 3D →
+// estouro com confete revelando o sticker → transição em estrela para o próximo ganho. Igual para todos os ganhos.
+const RW_GAINS = {
+  s0: [{ill:'rosto', title:'Rosto liberado!', text:'Agora você escolhe os olhos e a boca do seu Fuxo.'}],
+  s1: [{ill:'bracos', title:'Braços liberados!', text:'Escolha o tamanho dos braços e o tipo de mão.'},
+       {ill:'pernas', title:'Pernas liberadas!', text:'Escolha o tamanho das pernas e o calçado.'}],
+  s2: [{ill:'acc', title:'Novos acessórios!', acc:['chapeu','cauda']}],
+  s3: [{ill:'acc', title:'Novos acessórios!', acc:['oculos','cabeca']}],
+  s4: [{ill:'acc', title:'Novos acessórios!', acc:['pescoco','asas']}],
+  s5: [{ill:'acc', title:'Novo acessório!', acc:['capa']}],
+};
+let rwUid = 0;
+// sticker no estilo do abacaxi/abóbora do evento: contorno branco grosso envolvendo tudo e
+// rastro de cópias deslocadas (roxo, magenta, laranja) com bordas "fatiadas" em degraus
+function rwSticker(sil, art){
+  // rastro como nas ilustrações do evento: cópias deslocadas com a borda em ondas arredondadas.
+  // as faixas mudam de deslocamento suavemente e um filtro "gooey" arredonda os degraus
+  const u = 'rw' + (++rwUid), BAND = 9, bands = [];
+  for(let y = -14, k = 0; y < 136; y += BAND, k++) bands.push([y, k]);
+  const clips = bands.map(([y, k]) => `<clipPath id="${u}b${k}"><rect x="-40" y="${y}" width="220" height="${BAND + .8}"/></clipPath>`).join('');
+  const off = (k, dx) => dx + (Math.sin(k*1.7) * 3.6 + Math.sin(k*.9 + 1) * 2.4) * (dx / 14);
+  const trail = (dx, attrs) => bands.map(([, k]) => `<g clip-path="url(#${u}b${k})"><use href="#${u}s" transform="translate(${off(k, dx).toFixed(2)} 0)" ${attrs}/></g>`).join('');
+  const layers = [[21, '#EE7B3A'], [15, '#E64A9A'], [9, '#7B2FF2']];
+  const goo = `<filter id="${u}g" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter>`;
+  const white = 'fill="#fff" stroke="#fff" stroke-width="13" stroke-linejoin="round"';
+  return `<svg class="rw-ill" viewBox="-14 -14 166 152" aria-hidden="true"><defs><g id="${u}s">${sil}</g>${clips}${goo}</defs>
+    <g filter="url(#${u}g)">${layers.map(([dx]) => trail(dx, white)).join('')}<use href="#${u}s" ${white}/></g>
+    ${layers.map(([dx, f]) => `<g filter="url(#${u}g)">${trail(dx, `fill="${f}"`)}</g>`).join('')}
+    ${art}</svg>`;
+}
+// ilustrações a partir dos ícones das abas (mão = Braços, pés = Pernas, rosto = Rosto, chapéu = Acessórios)
+function rwIllustration(kind){
+  const c = fxHex(S.fuxo), ink = '#111', hi = 'rgba(255,255,255,.28)', lo = 'rgba(0,0,0,.16)';
+  if(kind === 'bracos'){
+    const g = `<g transform="rotate(-14 60 62)"><rect x="36" y="22" width="13" height="40" rx="6.5"/><rect x="50" y="14" width="13" height="46" rx="6.5"/><rect x="64" y="16" width="13" height="44" rx="6.5"/><rect x="78" y="26" width="13" height="36" rx="6.5"/><rect x="34" y="42" width="58" height="48" rx="22"/><rect x="18" y="50" width="13" height="32" rx="6.5" transform="rotate(-38 24 66)"/></g>`;
+    return rwSticker(g, `<g fill="${c}">${g}</g><g transform="rotate(-14 60 62)"><path d="M40 30v12M54 22v12M68 24v12" stroke="${hi}" stroke-width="4" stroke-linecap="round"/><path d="M46 78c8 6 22 6 32 0" fill="none" stroke="${lo}" stroke-width="4" stroke-linecap="round"/></g>`);
+  }
+  if(kind === 'pernas'){
+    const g = `<g transform="rotate(-6 34 60)"><rect x="26" y="20" width="22" height="46" rx="9"/><ellipse cx="29" cy="74" rx="24" ry="14"/></g><g transform="rotate(6 88 56)"><rect x="74" y="16" width="22" height="46" rx="9"/><ellipse cx="92" cy="70" rx="24" ry="14"/></g>`;
+    return rwSticker(g, `<g fill="${c}">${g}</g><g stroke="${ink}" stroke-width="4" stroke-linecap="round"><path d="M12 74v7M19 76v7" transform="rotate(-6 34 60)"/><path d="M103 72v7M110 70v7" transform="rotate(6 88 56)"/></g><g stroke="${hi}" stroke-width="4" stroke-linecap="round"><path d="M32 26v20" transform="rotate(-6 34 60)"/><path d="M80 22v20" transform="rotate(6 88 56)"/></g>`);
+  }
+  if(kind === 'rosto'){
+    const g = `<circle cx="60" cy="60" r="46"/>`;
+    return rwSticker(g, `<circle cx="60" cy="60" r="46" fill="${c}"/><path d="M28 34a46 46 0 0 1 30-18" fill="none" stroke="${hi}" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="44" cy="50" rx="8" ry="11" fill="${ink}"/><ellipse cx="76" cy="50" rx="8" ry="11" fill="${ink}"/><circle cx="46" cy="46" r="2.6" fill="#fff"/><circle cx="78" cy="46" r="2.6" fill="#fff"/>
+      <path d="M42 70c9 12 27 12 36 0" fill="none" stroke="${ink}" stroke-width="7" stroke-linecap="round"/>`);
+  }
+  const g = `<ellipse cx="60" cy="90" rx="52" ry="15"/><path d="M33 88 55 24C59 13 71 6 86 9l10 3c-12 3-19 10-21 20l12 56z"/>`;
+  return rwSticker(g, `<path d="M33 88 55 24C59 13 71 6 86 9l10 3c-12 3-19 10-21 20l12 56z" fill="#121014"/><ellipse cx="60" cy="90" rx="52" ry="15" fill="#121014"/>
+    <path d="M39 68h44l3 14H36z" fill="#7B2FF2"/><path d="M41 72h40" stroke="#A879FF" stroke-width="3"/><path d="M60 22c-3 8-5 16-7 24" stroke="${hi}" stroke-width="4" stroke-linecap="round"/>`);
+}
+const RW_STAR = 'M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0Z';
+let rwQueue = [], rwIdx = 0, rwReturn = null, rwBusy = false;
+function rwOrn(cls, n, rx, ry, seed, spread = .38){ let r = seed; const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+  return Array.from({length:n}, (_, i) => {
+    const ang = i * 2.39996 + rnd() * .5, k = 1 + rnd() * spread;
+    const x = Math.round(Math.cos(ang) * rx * k), y = Math.round(Math.sin(ang) * ry * k);
+    const c = ['#FFE38A','#fff','#FF8A6A','#C9A0F5','#fff','#FFE38A'][i % 6];
+    const t = `${Math.round(rnd() * 700)}ms`, d = `${(1.4 + rnd() * 1.4).toFixed(2)}s`, dot = rnd() < .38;
+    const sz = dot ? 4 + Math.round(rnd() * 5) : 10 + Math.round(rnd() * 14);
+    return dot
+      ? `<i class="rw-orn dot ${cls}" style="--x:${x}px;--y:${y}px;--s:${sz}px;--c:${c};--t:${t};--d:${d}"></i>`
+      : `<svg class="rw-orn star ${cls}" viewBox="0 0 100 100" style="--x:${x}px;--y:${y}px;--s:${sz}px;--c:${c};--t:${t};--d:${d}"><path d="${RW_STAR}"/></svg>`;
+  }).join(''); }
+function rwRender(){
+  const g = rwQueue[rwIdx];
+  const accTxt = g.acc ? g.acc.map(k => `<span class="rw-chip">${FX_ACC[k].label} <b>${FX_ACC[k].opts.length}</b></span>`).join('') : '';
+  // enfeites (estrelinhas e bolinhas) distribuídos num anel elíptico ao redor da ilustração — nunca por cima dela
+  // enfeites espalhados de forma orgânica num anel irregular ao redor da ilustração (nunca por cima):
+  // ângulo áureo + ruído, distâncias e tamanhos variados, ritmos de brilho diferentes
+  const orn = rwOrn;
+
+  const dia = (cx, cy) => `M${cx} ${cy - 19}L${cx + 19} ${cy}L${cx} ${cy + 19}L${cx - 19} ${cy}Z`;
+  const sym = [dia(50, 24), dia(76, 50), dia(50, 76), dia(24, 50)].join('');
+  $('#rw-stage').innerHTML = `
+    <span class="rw-speed"></span><span class="rw-halo"></span>
+    ${orn('pre', 9, 98, 92, 7)}
+    <svg class="rw-sym" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="rwsg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9A0F5"/><stop offset=".55" stop-color="#8740E9"/><stop offset="1" stop-color="#5B22D9"/></linearGradient></defs>
+      <path d="${sym}" fill="url(#rwsg)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M46 14l-8 8M72 40l-8 8M46 66l-8 8M20 40l-8 8" stroke="rgba(255,255,255,.7)" stroke-width="3.5" stroke-linecap="round"/></svg>
+    <span class="rw-burst"></span><span class="rw-flash"></span>
+    ${Array.from({length:14}, (_, i) => `<i class="rw-conf" style="--a:${i*25.7}deg;--d:${130 + (i%4)*24}px;--r:${(i%2 ? 1 : -1)*(200 + i*30)}deg;background:${['#FF4B27','#D430A8','#8740E9','#FFC23D','#fff','#7FD3FF'][i%6]}"></i>`).join('')}
+    ${orn('post', 13, 122, 100, 42)}
+    <div class="rw-card"><img class="rw-ill" src="assets/conquistas/${({rosto:'rosto', bracos:'bracos', pernas:'pernas', acc:'chapeu'})[g.ill]}.svg" alt=""></div>`;
+  $('#rw-title').textContent = g.title;
+  $('#rw-text').innerHTML = g.acc ? `Liberados para personalizar o Fuxo:<span class="rw-chips">${accTxt}</span>` : esc(g.text);
+  $('#rw-dots').innerHTML = rwQueue.length > 1 ? rwQueue.map((_, i) => `<i class="${i === rwIdx ? 'on' : ''}"></i>`).join('') : '';
+  // centraliza pelo desenho real (o rastro fica à direita e deslocava o centro)
+  const ill = $('#rw-stage .rw-ill');
+  // ilustrações vetorizadas a partir dos stickers do Figma (2166:733) e o chapéu dos stickers do evento
+  const body = $('#rw .rw-body'); body.classList.remove('play'); void body.offsetWidth; body.classList.add('play');
+}
+function showReward(slot){
+  rwQueue = RW_GAINS[slot.id] || []; rwIdx = 0; if(!rwQueue.length) return;
+  rwReturn = document.activeElement;
+  $('#rw-eyebrow').textContent = `Você concluiu ${({s0:'o coffee break', s1:'a abertura', s2:'a palestra', s3:'a apresentação Detach', s4:'o workshop', s5:'o encerramento'})[slot.id] || slot.short}!`;
+  const rw = $('#rw'); rw.hidden = false; rw.classList.remove('out', 'wipe-in', 'wipe-out');
+  rwRender(); $('#rw-go').focus();
+}
+// transição em estrela (fim do vídeo): a estrela cresce até cobrir a tela, troca o conteúdo e encolhe
+// atalho: fecha a recompensa (pulando os ganhos restantes) e abre a personalização
+$('#rw-custom').onclick = () => {
+  const rw = $('#rw'); rw.classList.add('out');
+  setTimeout(() => { rw.hidden = true; rw.classList.remove('out', 'wipe-in', 'wipe-out'); rwBusy = false; const g = rwQueue[rwIdx]; openEditor(g ? (g.acc ? 'acessorios' : g.ill) : undefined); }, 260);
+};
+$('#rw-go').onclick = () => {
+  if(rwBusy) return;
+  const rw = $('#rw'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, last = rwIdx >= rwQueue.length - 1;
+  if(reduce){ if(last){ rw.hidden = true; rwReturn?.focus?.(); } else { rwIdx++; rwRender(); } return; }
+  rwBusy = true; rw.classList.remove('wipe-out'); void rw.offsetWidth; rw.classList.add('wipe-in');
+  setTimeout(() => {
+    if(last){ rw.classList.add('out'); setTimeout(() => { rw.hidden = true; rw.classList.remove('out', 'wipe-in'); rwBusy = false; if(rwReturn && document.contains(rwReturn)) rwReturn.focus(); }, 320); return; }
+    rwIdx++; rwRender(); rw.classList.remove('wipe-in'); rw.classList.add('wipe-out');
+    setTimeout(() => { rw.classList.remove('wipe-out'); rwBusy = false; }, 500);
+  }, 480);
+};
+
+/* ================= drawer de atividade ================= */
+let cur = null, lastFocus = null, urlTouched = false;
+const attrOf = b => (b.getAttribute('role') === 'radio' || b.getAttribute('role') === 'checkbox') ? 'aria-checked' : 'aria-pressed';
+const isOn = b => b.getAttribute(attrOf(b)) === 'true';
+function quizFeedback(it, ans){
+  const ok = ans === it.a;
+  return `<p class="quiz-fb ${ok ? 'ok' : 'no'}"><b>${ok ? 'Acertou!' : 'Quase!'}</b> É ${it.a.toLowerCase()}. ${esc(it.why)}</p>`;
+}
+function openSheet(id){
+  const a = ACTS.find(x => x.id === id); cur = a; lastFocus = document.activeElement;
+  const done = !!S.done[id], d = S.data[id] || {}, dis = done ? 'disabled' : '';
+  const slot = SLOTS.find(s => s.id === a.slot);
+  let body = done ? `<div class="done-note">${ICON_CHECK}<span>Atividade concluída</span></div>` : '';
+  switch(a.type){
+    case 'single':
+      body += `<div class="opts" data-group="single" role="radiogroup" aria-label="${esc(a.title)}">${a.options.map(o=>`<button class="opt" role="radio" data-pick="${esc(o)}" aria-checked="${d.v===o}" ${dis}>${esc(o)}</button>`).join('')}</div>`;
+      break;
+    case 'multi': {
+      const v = d.v || [];
+      body += a.view === 'list'
+        ? `<div class="opts" data-group="multi" data-max="${a.max || 99}" aria-label="${esc(a.title)}">${a.options.map(o=>`<button class="opt box" role="checkbox" data-pick="${esc(o)}" aria-checked="${v.includes(o)}" ${dis}>${esc(o)}</button>`).join('')}</div>`
+        : `<div class="pills" data-group="multi" data-max="${a.max || 99}" aria-label="${esc(a.title)}">${a.options.map(o=>`<button class="pill" data-pick="${esc(o)}" aria-pressed="${v.includes(o)}" ${dis}>${esc(o)}</button>`).join('')}</div>`;
+      body += `<p class="help" id="multi-help" role="status" style="margin-top:12px"></p>`;
+      if(done && a.coupon) body += couponHTML(a.coupon);
+      break; }
+    case 'quiz': {
+      const ans = d.answers || {};
+      body += `<div class="quiz">${a.items.map((it,i)=>`<div class="quiz-item" id="quiz-${i}"><p class="quiz-q">${esc(it.q)}</p><div class="quiz-btns">${['Mito','Verdade'].map(o=>`<button class="pill" data-quiz="${i}" data-ans="${o}" aria-pressed="${ans[i]===o}" ${ans[i]?'disabled':''}>${o}</button>`).join('')}</div>${ans[i] ? quizFeedback(it, ans[i]) : ''}</div>`).join('')}</div>`;
+      break; }
+    case 'checklist': {
+      const ch = d.checks || [];
+      body += `<div class="opts" data-group="toggle" data-persist="checks">${a.items.map((t,i)=>`<button class="opt box" role="checkbox" data-pick="${i}" aria-checked="${ch.includes(i)}" ${dis}>${esc(t)}</button>`).join('')}</div>`;
+      // "Publiquei": abre o campo do link logo abaixo (obrigatório só para quem marcou que publicou)
+      if(a.link != null) body += `<div class="field link-field" id="link-field" ${ch.includes(a.link) ? '' : 'hidden'}><label for="link-input">Link do seu portfólio</label>
+        <input id="link-input" type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="seunome.github.io/portfolio" value="${esc(d.link || '')}" aria-describedby="link-msg" ${dis}>
+        <p class="help" id="link-msg">${done ? '' : 'Cole o endereço publicado no GitHub Pages'}</p></div>`;
+      break; }
+    case 'raiox': {
+      // 4 perguntas numa gaveta: travou (várias) · ajudou (até 2) · confiança (abacaxis 1–5) · texto curto opcional
+      const tv = d.trav || [], aj = d.ajuda || [];
+      const pills = (q, opts, sel, max, solo) => `<div class="pills" data-group="multi" data-q="${q}" data-max="${max}" aria-labelledby="rx-${q}">${opts.map(o=>`<button class="pill" data-pick="${esc(o)}" aria-pressed="${sel.includes(o)}" ${o === solo ? 'data-solo="1"' : ''} ${dis}>${esc(o)}</button>`).join('')}</div><p class="help grp" role="status"></p>`;
+      // 2 passos para a gaveta ficar menos densa: (1) travou + ajudou → Continuar → (2) confiança + comentário → Concluir.
+      // Concluída, mostra tudo junto (só leitura).
+      rxStep = 1;
+      body += `<div class="rx-step" data-step="1"><h3 class="rx-q" id="rx-trav">Em que parte você travou?</h3>${pills('trav', a.trav, tv, 99, 'Não travei')}
+        <h3 class="rx-q" id="rx-ajuda">O que mais te ajudou? <small>(escolha até 2)</small></h3>${pills('ajuda', a.ajuda, aj, 2, 'Não me ajudou')}</div>
+        <div class="rx-step" data-step="2" ${done ? '' : 'hidden'}>${done ? '' : `<button class="rx-back" id="rx-back">${lu('chevron-left', 2.4)}Voltar</button>`}<h3 class="rx-q" id="rx-conf">Quão confiante você está para atualizar seu portfólio sozinho?</h3>
+        <p class="rx-cap" id="rx-cap" aria-live="polite"></p>
+        <div class="stars abx" data-group="single" data-q="conf" role="radiogroup" aria-labelledby="rx-conf">${[1,2,3,4,5].map(n=>`<button class="star" role="radio" data-pick="${n}" aria-checked="${d.conf===n}" aria-label="${n} de 5: ${CONF_TXT[n-1]}" style="--i:${n-1}" ${dis}><img class="pk" src="assets/abacaxi.png" width="34" height="58" alt=""></button>`).join('')}</div>
+        <div class="field rx-field"><label for="rx-text">Quer contar mais alguma coisa? <small>(opcional)</small></label>
+          <input id="rx-text" type="text" maxlength="140" placeholder="Uma dica, um elogio, uma sugestão…" value="${esc(d.text || '')}" ${dis}></div></div>`;
+      break; }
+    case 'rating':
+      body += `<div class="stars" data-group="single" role="radiogroup" aria-label="Nota de 1 a 5 abóboras">${[1,2,3,4,5].map(n=>`<button class="star" role="radio" data-pick="${n}" aria-checked="${d.score===n}" aria-label="${n} ${n===1?'abóbora':'abóboras'}: ${RATE_TXT[n-1]}" style="--i:${n-1}" ${dis}><img class="pk" src="assets/abobora.png" width="58" height="52" alt=""></button>`).join('')}</div>
+        <label class="field rate-field" id="rate-field" ${d.score ? '' : 'hidden'} ${done && !d.text ? 'style="display:none"' : ''}><span><span id="rate-q"></span> <small>(opcional)</small></span>
+          <textarea id="rate-text" rows="3" maxlength="280" placeholder="Ex.: o workshop, a palestra, a galera…" ${dis}>${esc(d.text || '')}</textarea></label>`;
+      break;
+  }
+  $('#sheet-body').innerHTML = `<p class="sheet-eyebrow">${esc(a.label)}</p><h2 id="sheet-title" tabindex="-1">${esc(a.title)}</h2><p class="sheet-desc" id="sheet-desc" ${a.type === 'rating' ? 'aria-live="polite"' : ''}>${esc(a.desc)}</p>${a.note ? `<p class="sheet-note"><b>${esc(a.note[0])}:</b> ${esc(a.note[1])}</p>` : ''}${body}`;
+  clearTimeout(sheetT); $('#scrim').classList.remove('out'); $('#sheet').classList.remove('out');
+  $('#scrim').hidden = false; $('#sheet').hidden = false;
+  // preventScroll: a gaveta começa fora da tela (animação de subida); sem isso o navegador rolava a tela de trás para "mostrar" o título
+  if(a.type === 'raiox' && !done) $('.sheet-eyebrow').textContent = `${a.label} · 1 de 2`;
+  validate(); $('#sheet-title').focus({preventScroll: true});
+}
+let sheetT = 0;
+function closeSheet(){
+  if($('#sheet').hidden || $('#sheet').classList.contains('out')) return;
+  cur = null; $('#sheet').classList.add('out'); $('#scrim').classList.add('out');
+  const ms = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 260;
+  sheetT = setTimeout(() => { $('#sheet').hidden = true; $('#scrim').hidden = true; $('#sheet').classList.remove('out'); $('#scrim').classList.remove('out'); }, ms);
+  if(lastFocus && document.contains(lastFocus)) lastFocus.focus({preventScroll: true});
+}
+$('#sheet-close').onclick = closeSheet;
+$('#scrim').onclick = closeSheet;
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if(!$('#pot').hidden) $('#pot-go').click();
+  else if(!$('#rw').hidden) $('#rw-go').click();
+  else if(!$('#lvl').hidden) $('#lvl').hidden = true;
+  else if(!$('#result').hidden) closeResult();
+  else if(!$('#cam').hidden) closeCam();
+  else if(!$('#editor').hidden) $('#ed-cancel').click();
+  else if(!$('#sheet').hidden) closeSheet();
+});
+$('#sheet-body').addEventListener('click', e => {
+  if(e.target.closest('#rx-back')){ rxGo(1); return; }
+  // Quiz: cada frase é respondida uma vez e mostra a resposta na hora
+  const q = e.target.closest('[data-quiz]');
+  if(q && !q.disabled && cur){
+    const i = +q.dataset.quiz, it = cur.items[i];
+    const ans = {...((S.data[cur.id] || {}).answers || {}), [i]: q.dataset.ans};
+    S.data[cur.id] = {...(S.data[cur.id] || {}), answers: ans}; save();
+    const box = $('#quiz-' + i);
+    box.querySelectorAll('[data-quiz]').forEach(b => { b.setAttribute('aria-pressed', b === q); b.disabled = true; });
+    box.insertAdjacentHTML('beforeend', quizFeedback(it, q.dataset.ans));
+    validate(); return;
+  }
+  const b = e.target.closest('[data-pick]'); if(!b || b.disabled) return;
+  const g = b.closest('[data-group]'), mode = g.dataset.group;
+  if(mode === 'single') g.querySelectorAll('[data-pick]').forEach(x => x.setAttribute(attrOf(x), x === b));
+  else {
+    const on = !isOn(b);
+    // opção exclusiva ("Não travei", "Não me ajudou"): marcar ela limpa as outras, e vice-versa
+    if(on && mode === 'multi') g.querySelectorAll('[data-pick]').forEach(x => { if(x !== b && (b.dataset.solo || x.dataset.solo)) x.setAttribute(attrOf(x), false); });
+    if(on && mode === 'multi' && [...g.querySelectorAll('[data-pick]')].filter(isOn).length >= +g.dataset.max){
+      const h = g.nextElementSibling?.classList.contains('grp') ? g.nextElementSibling : $('#multi-help'); h.textContent = `Você já escolheu ${g.dataset.max}. Desmarque uma para trocar.`; h.className = h.classList.contains('grp') ? 'err grp' : 'err'; return;
+    }
+    b.setAttribute(attrOf(b), on);
+    if(g.dataset.persist){ S.data[cur.id] = {...(S.data[cur.id]||{}), [g.dataset.persist]: [...g.querySelectorAll('[data-pick]')].filter(isOn).map(x => +x.dataset.pick)}; save(); }
+    if(cur.link != null && +b.dataset.pick === cur.link){ const f = $('#link-field'); f.hidden = !on; if(on) setTimeout(() => $('#link-input').focus(), 50); }
+  }
+  validate();
+});
+// link: guarda enquanto digita (não perde ao fechar a gaveta); erro só aparece ao sair do campo
+$('#sheet-body').addEventListener('input', e => {
+  if(e.target.id !== 'link-input' || !cur) return;
+  S.data[cur.id] = {...(S.data[cur.id] || {}), link: e.target.value}; save();
+  if(e.target.getAttribute('aria-invalid') === 'true') linkMsg(true);
+  validate();
+});
+$('#sheet-body').addEventListener('focusout', e => { if(e.target.id === 'link-input') linkMsg(true); });
+function collect(){
+  const a = cur, B = $('#sheet-body');
+  const picked = () => [...B.querySelectorAll('[data-pick]')].filter(isOn).map(x => x.dataset.pick);
+  switch(a.type){
+    case 'single': { const v = picked()[0]; return {ok:!!v, data:{v}}; }
+    case 'multi': { const v = picked(); return {ok: v.length >= (a.min || 1) && v.length <= (a.max || 99), data:{v}}; }
+    case 'quiz': { const answers = (S.data[a.id] || {}).answers || {}; return {ok: Object.keys(answers).length === a.items.length, data:{answers}}; }
+    case 'checklist': {
+      const c = picked().map(Number), opt = a.optional || [];
+      let ok = a.items.every((_, i) => opt.includes(i) || c.includes(i)), link;
+      if(a.link != null && c.includes(a.link)){ link = normUrl(($('#link-input') || {}).value); ok = ok && !!link; }
+      return {ok, data:{checks:c, link}}; }
+    case 'raiox': {
+      const q = k => [...B.querySelectorAll(`[data-q="${k}"] [data-pick]`)].filter(isOn).map(x => x.dataset.pick);
+      const trav = q('trav'), ajuda = q('ajuda'), conf = +q('conf')[0] || null, text = (($('#rx-text') || {}).value || '').trim();
+      return {ok: trav.length > 0 && ajuda.length > 0 && !!conf, data:{trav, ajuda, conf, text}}; }
+    case 'rating': { const score = +picked()[0] || null, text = (($('#rate-text') || {}).value || '').trim(); return {ok:!!score, data:{score, text}}; }
+    default: return {ok:true, data:{}};
+  }
+}
+// abóbora: asset do Figma (37:8575), exportado em assets/abobora.png
+const CONF_TXT = ['Nada confiante','Pouco confiante','Mais ou menos','Confiante','Muito confiante'];
+// abacaxis da confiança: mesmo comportamento das abóboras, com a frase logo abaixo (asset Figma 45:16487)
+function syncConf(){
+  const st = [...document.querySelectorAll('#sheet-body .stars.abx .star')]; if(!st.length) return;
+  const n = +(st.find(x => x.getAttribute('aria-checked') === 'true') || {dataset:{}}).dataset.pick || 0;
+  st.forEach(x => { const on = +x.dataset.pick <= n; if(on && !x.classList.contains('lit')) void x.offsetWidth; x.classList.toggle('lit', on); });
+  $('#rx-cap').innerHTML = n ? `<b class="rate-score">${n}</b> · ${CONF_TXT[n-1]}` : 'Toque nos abacaxis para responder';
+}
+const RATE_TXT = ['Não curti','Dá pra melhorar','Foi legal','Arrepiante de bom!','Amei, de arrepiar!'];
+function syncRating(){
+  const stars = [...document.querySelectorAll('#sheet-body .star')]; if(!stars.length) return;
+  const score = +(stars.find(x => x.getAttribute('aria-checked') === 'true') || {dataset:{}}).dataset.pick || 0;
+  stars.forEach(x => {
+    const on = +x.dataset.pick <= score;
+    if(on && !x.classList.contains('lit')){ x.classList.remove('lit'); void x.offsetWidth; } // reinicia o "pulo"
+    x.classList.toggle('lit', on);
+  });
+  // a frase da nota substitui a descrição logo abaixo do título
+  $('#sheet-desc').innerHTML = score ? `<b class="rate-score">${score}</b> · ${RATE_TXT[score-1]}` : 'Toque nas abóboras para avaliar';
+  // campo opcional aparece só depois da nota, com pergunta que acompanha o tom dela
+  const f = $('#rate-field'); if(score) f.hidden = false;
+  $('#rate-q').textContent = score >= 4 ? 'O que mais te arrepiou de bom?' : 'O que faltou para ganhar mais abóboras?';
+}
+// aceita com ou sem https:// e devolve o endereço completo; null se não parecer um link
+function normUrl(v){
+  v = (v || '').trim(); if(!v || /\s/.test(v)) return null;
+  if(!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  try{ const u = new URL(v); return /\.[a-z]{2,}$/i.test(u.hostname) ? u.href : null; }catch(e){ return null; }
+}
+function linkMsg(showErr){
+  const i = $('#link-input'), m = $('#link-msg'); if(!i || i.disabled) return;
+  const bad = showErr && i.value.trim() && !normUrl(i.value);
+  i.setAttribute('aria-invalid', bad ? 'true' : 'false');
+  m.className = bad ? 'err' : 'help';
+  m.textContent = bad ? 'Confira o link. Ele deve ser algo como seunome.github.io' : 'Cole o endereço publicado no GitHub Pages';
+}
+let rxStep = 1;
+function rxGo(n){
+  rxStep = n;
+  document.querySelectorAll('#sheet-body .rx-step').forEach(el => { el.hidden = +el.dataset.step !== n; if(!el.hidden){ el.classList.remove('in', 'back'); void el.offsetWidth; el.classList.add(n === 2 ? 'in' : 'back'); } });
+  $('.sheet-eyebrow').textContent = `${cur.label} · ${n} de 2`;
+  $('.sheet-scroll').scrollTop = 0; validate();
+  $(n === 2 ? '#rx-conf' : '#rx-trav').setAttribute('tabindex', '-1'); $(n === 2 ? '#rx-conf' : '#rx-trav').focus({preventScroll: true});
+}
+function validate(){
+  if(cur && cur.type === 'rating') syncRating();
+  if(cur && cur.type === 'raiox'){ syncConf(); if(!S.done[cur.id]) document.querySelectorAll('#sheet-body .grp').forEach(h => { h.className = 'help grp'; h.textContent = ''; }); }
+  if(!cur) return;
+  const cta = $('#sheet-cta'), done = !!S.done[cur.id];
+  const r = collect();
+  // sem contador de marcadas: o espaço só mostra o aviso quando a pessoa tenta passar do limite
+  if(cur.type === 'multi' && !done){ const h = $('#multi-help'); h.className = 'help'; h.textContent = ''; }
+  if(done || cur.type === 'auto'){ cta.disabled = false; cta.textContent = 'Fechar'; return; }
+  if(cur.type === 'raiox' && rxStep === 1){ cta.disabled = !(r.data.trav.length && r.data.ajuda.length); cta.textContent = 'Continuar'; return; }
+  cta.disabled = !r.ok; cta.textContent = 'Concluir atividade';
+}
+$('#sheet-cta').onclick = () => {
+  if(!cur) return;
+  if(S.done[cur.id] || cur.type === 'auto'){ closeSheet(); return; }
+  if(cur.type === 'raiox' && rxStep === 1){ rxGo(2); return; }
+  const r = collect(); if(!r.ok) return;
+  S.data[cur.id] = r.data; const id = cur.id;
+  closeSheet(); complete(id);
+};
+
+/* ================= câmera + template ================= */
+let stream = null, camLive = false, facing = 'user', withMascot = true, lastBlob = null, lastURL = null, camReturn = null;
+const video = $('#video'), overlay = $('#overlay');
+const fontsReady = (async () => { try{ await Promise.all([document.fonts.load('800 60px "Bricolage Grotesque"'), document.fonts.load('500 30px "Manrope"'), document.fonts.load('700 30px "Manrope"')]); }catch(e){} })();
+// templates do story (Figma 2146:5894 com Fuxo / 2147:7190 sem Fuxo), fundo transparente, 1080 × 1920
+const TPL = {};
+const tplImage = m => TPL[m] || (TPL[m] = new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `assets/story-${m ? 'com' : 'sem'}.png?v=5`; }));
+// Uma única função desenha o template na prévia e na foto final: o que a pessoa vê é o que ela salva.
+async function drawTemplate(ctx, W, H){
+  const tpl = await tplImage(withMascot); if(tpl) ctx.drawImage(tpl, 0, 0, W, H);
+  if(!withMascot) return;
+  // Fuxo da pessoa no lugar do Monstrinho do template: mesma escala do Figma, em pé sobre a faixa preta
+  await fxLoad();
+  // posição e escala exatas da instância do Monstrinho no Figma (x 674, y 1129, 400×520 → 348.94×453.63)
+  const k = W / 1080, ky = H / 1920, sc = .87236 * k;
+  ctx.save(); ctx.translate(674*k, 1129*ky); ctx.scale(sc, sc); fxDraw(ctx, S.fuxo); ctx.restore();
+}
+async function drawOverlay(){
+  const r = overlay.getBoundingClientRect(); if(!r.width) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  overlay.width = Math.round(r.width*dpr); overlay.height = Math.round(r.height*dpr);
+  const ctx = overlay.getContext('2d'); ctx.clearRect(0,0,overlay.width,overlay.height);
+  await drawTemplate(ctx, overlay.width, overlay.height);
+}
+new ResizeObserver(() => { if(!$('#cam').hidden) drawOverlay(); }).observe($('#viewfinder'));
+async function startStream(){
+  stopStream();
+  try{
+    if(!navigator.mediaDevices?.getUserMedia) throw new Error('sem suporte');
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width:{ideal:1440}, height:{ideal:1800}}, audio:false});
+    video.srcObject = stream; await video.play(); camLive = true;
+  }catch(e){ camLive = false; }
+  video.hidden = !camLive; video.classList.toggle('mirror', facing === 'user');
+  $('#vf-fallback').hidden = camLive;
+  $('#vf-msg').textContent = 'A prévia ao vivo não abre nesta visualização. Toque no botão de foto para abrir a câmera do celular: o template é aplicado na hora.';
+}
+function stopStream(){ if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; } }
+function openCam(){
+  camReturn = camReturn || document.activeElement;
+  if(!document.querySelector('#cam .blob')){ ['#cam','#result'].forEach(id => $(id + ' .trail-bg').insertAdjacentHTML('afterbegin', BLOBS)); }
+  $('#cam').hidden = false; $('#vf-fallback').hidden = false; $('#vf-msg').textContent = 'Abrindo a câmera…';
+  syncSeg(); requestAnimationFrame(drawOverlay); startStream(); $('#shutter').focus();
+}
+function closeCam(){ stopStream(); $('#cam').hidden = true; if(camReturn && document.contains(camReturn)) camReturn.focus(); camReturn = null; }
+// botão do Fuxo: liga/desliga o Fuxo no template (substitui o seletor Sem/Com Fuxo)
+function syncSeg(){
+  const b = $('#ph-fuxo'); b.setAttribute('aria-pressed', withMascot);
+  const cv = b.querySelector('canvas'); fxLoad().then(() => fxRender(cv, S.fuxo, {crop: fxAvatarCrop(S.fuxo), w:52, h:52}));
+}
+$('#ph-fuxo').onclick = () => { withMascot = !withMascot; syncSeg(); drawOverlay(); };
+$('#open-cam').onclick = openCam;
+$('#cam-close').onclick = closeCam;
+$('#shutter').onclick = () => { if(camLive && video.videoWidth) compose(video, video.videoWidth, video.videoHeight, facing === 'user'); else $('#file-cam').click(); };
+$('#pick-gallery').onclick = () => $('#file-gal').click();
+['#file-cam','#file-gal'].forEach(s => $(s).addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
+  const url = URL.createObjectURL(f), im = new Image();
+  im.onload = () => { compose(im, im.naturalWidth, im.naturalHeight, false).finally(() => URL.revokeObjectURL(url)); };
+  im.onerror = () => { URL.revokeObjectURL(url); toast('Não foi possível abrir essa imagem. Tente outra.'); };
+  im.src = url;
+}));
+async function compose(src, sw, sh, mirror){
+  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#1B1128'; ctx.fillRect(0,0,W,H);
+  const s = Math.max(W/sw, H/sh), dw = sw*s, dh = sh*s;
+  ctx.save(); if(mirror){ ctx.translate(W,0); ctx.scale(-1,1); }
+  ctx.drawImage(src, (W-dw)/2, (H-dh)/2, dw, dh); ctx.restore();
+  await drawTemplate(ctx, W, H);
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+  fxFree(c);
+  if(!blob){ toast('Não foi possível gerar a foto. Tente de novo.'); return; }
+  lastBlob = blob; if(lastURL) URL.revokeObjectURL(lastURL); lastURL = URL.createObjectURL(blob);
+  $('#result-img').src = lastURL;
+  stopStream(); $('#cam').hidden = true; $('#result').hidden = false; $('#save-hint').textContent = ''; $('#save-btn').focus();
+  if(!S.done.foto) setTimeout(() => complete('foto'), 400);
+}
+async function getDownloads(){ try{ return window.claude?.use ? await window.claude.use('downloads') : null; }catch(e){ return null; } }
+// salvar: no celular abre o salvamento nativo (folha de compartilhar → "Salvar imagem"); no computador baixa o arquivo
+$('#save-btn').onclick = async () => {
+  if(!lastBlob) return;
+  const file = new File([lastBlob], 'esquenta-detach.jpg', {type: 'image/jpeg'});
+  try{
+    if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'Esquenta Detach!'}); return; }
+  }catch(e){ if(e && e.name === 'AbortError') return; }
+  const dl = await getDownloads();
+  try{ if(dl){ await dl.save({filename: 'esquenta-detach.jpg', data: lastBlob}); toast('Foto salva'); return; } }catch(e){ if(e && e.code === 'declined') return; }
+  try{ const a = document.createElement('a'); a.href = lastURL; a.download = 'esquenta-detach.jpg'; document.body.appendChild(a); a.click(); a.remove(); toast('Foto salva'); }
+  catch(e){ $('#save-hint').textContent = 'Toque e segure a imagem e escolha "Salvar imagem".'; }
+};
+function closeResult(){ $('#result').hidden = true; if(camReturn && document.contains(camReturn)) camReturn.focus(); camReturn = null; }
+$('#retake').onclick = () => { $('#result').hidden = true; openCam(); };
+
+/* ================= boot ================= */
+function boot(){
+  ['#sheet','#scrim','#cam','#result','#lvl','#editor','#signup'].forEach(s => $(s).hidden = true);
+  if(S.onboarded && !S.user){ $('#onboarding').hidden = true; $('#main').hidden = true; openSignup(); }
+  else if(S.onboarded){ $('#onboarding').hidden = true; $('#main').hidden = false; renderTrilha(); }
+  else { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; }
+}
+boot();
+})();
+</script>
+
+</body>
+</html>
