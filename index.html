@@ -128,10 +128,12 @@ button{cursor:pointer}
 /* svh reserva o espaco ocupado pelas barras abertas do navegador mobile. */
 .stage{height:100vh;height:100svh}
 .ob-progress,.ob-foot{flex-shrink:0}
-.ob-body{padding-top:clamp(20px,6cqh,56px);scrollbar-width:thin;overflow-x:hidden}
+.ob-body{justify-content:safe center;padding-block:24px;scrollbar-width:thin;overflow-x:hidden}
 .ob-body>*{flex-shrink:0;max-width:100%}
 .ob-art{min-width:0;max-width:353px}
-.ob-text{padding-top:40px}
+.ob-text{margin:0;padding-top:40px}
+/* Compensa os 28px das camadas decorativas abaixo do card. */
+.ob-art:has(.ob-stack)+.ob-text{margin-top:28px}
 .ob-fuxo{width:min(300px,100%);height:auto;aspect-ratio:30/29}
 .ob-stories{width:353px;height:auto;aspect-ratio:353/491}
 .ob-stories .s1{left:2.833%;top:0;width:55.524%;height:auto}
