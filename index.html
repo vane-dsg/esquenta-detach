@@ -128,21 +128,14 @@ button{cursor:pointer}
 .su-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);font-variation-settings:"opsz" 14}
 .su-fuxo{width:110px;height:110px;margin:auto 0 10px;flex:0 0 auto}   /* margem automática em cima e no rodapé: o bloco fica centralizado no espaço livre */
 .su-sub{max-width:none;font-size:clamp(13px,3.75vw,15px);line-height:1.4;white-space:nowrap}
-.su-field{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:20px;text-align:left}
-.su-field+.su-field{margin-top:14px}
-.su-field>span{font-family:var(--f-dm);font-weight:700;font-size:14px;color:var(--fg)}
-.su-field input{width:100%;min-height:52px;padding:0 18px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);color:var(--fg);font-family:var(--f-dm);font-weight:600;font-size:16px}
-.su-field input::placeholder{color:rgba(189,177,204,.6)}
-.su-field input:focus{outline:none;border-color:#FF2D03;box-shadow:0 0 0 3px rgba(255,45,3,.25)}
-.su-field input[aria-invalid="true"]{border-color:#FF8A7A}
-.su-err{min-height:0;font-size:13px;font-weight:600;color:#FF8A7A}
+.su-err{min-height:0;text-align:center;font-size:13px;font-weight:600;color:#FF8A7A}
 .su-err:empty{display:none}
 .su-note{margin:14px 0 0;font-size:13px;color:var(--muted)}
 .su-foot{width:100%;margin-top:auto;padding-top:24px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .su-cta{width:100%;justify-content:center;min-height:54px}
 .su-cta:disabled{opacity:.6}
-.su-switch{border:0;background:none;color:var(--fg);font-family:var(--f-dm);font-weight:700;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:4px}
-.su.is-login #su-name-wrap{display:none}
+.su-google{justify-content:center;background:#fff;color:#1F1F1F;box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}   /* o Google pede o "G" colorido sobre fundo branco (ou escuro), nunca sobre a cor da marca */
+.su-google svg{width:20px;height:20px}
 .mini-agenda{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
 .mini-agenda li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:9px 12px;font-weight:700;font-size:14px}
 .mini-agenda li:first-child{background:var(--fg);color:#12091C}
@@ -716,22 +709,16 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
     <!-- CADASTRO (após o onboarding) -->
     <section class="screen ob su" id="signup" aria-labelledby="su-title" hidden>
       <div class="trail-bg" aria-hidden="true"><div class="veil"></div><div class="tex"></div></div>
-      <form class="su-body" id="su-form" novalidate>
+      <div class="su-body">
         <canvas class="su-fuxo" id="su-fuxo" aria-hidden="true"></canvas>
         <h1 id="su-title" tabindex="-1">Crie seu acesso</h1>
         <p class="ob-sub su-sub" id="su-sub">Para não perder seu progresso, e nem seu Fuxo</p>
-        <label class="su-field" id="su-name-wrap"><span>Nome e sobrenome</span>
-          <input id="su-name" name="name" autocomplete="name" autocapitalize="words" placeholder="Ex.: Ana Souza" aria-describedby="su-name-err">
-          <small class="su-err" id="su-name-err" aria-live="polite"></small></label>
-        <label class="su-field"><span>E-mail</span>
-          <input id="su-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="voce@email.com" aria-describedby="su-email-err">
-          <small class="su-err" id="su-email-err" aria-live="polite"></small></label>
-        <p class="su-note">Usamos seu e-mail só para salvar sua trilha neste evento</p>
+        <p class="su-note">Entre com sua conta Google: sua trilha fica salva e você continua em qualquer aparelho</p>
         <div class="su-foot">
-          <button class="ob-btn ob-next su-cta" id="su-cta" type="submit">Começar a trilha<i data-lu="arrow-right"></i></button>
-          <button class="su-switch" id="su-switch" type="button">Já criei meu acesso</button>
+          <button class="ob-btn su-cta su-google" id="su-cta" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continuar com Google</span></button>
+          <small class="su-err" id="su-err" role="alert"></small>
         </div>
-      </form>
+      </div>
     </section>
 
     <!-- APP -->
@@ -869,6 +856,7 @@ button.node:focus-visible{outline:2px solid #fff;outline-offset:3px}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (() => {
 /* ================= dados ================= */
@@ -999,11 +987,24 @@ const FX_DEFAULT = {formato:'Fantasma', estilo:'Liso', cor:'Roxo', q:'Dois olhos
 const FX_TABS = [['corpo','Corpo','ghost',null],['cor','Cor','palette',null],['rosto','Rosto','smile','s0'],['bracos','Braços','hand','s1'],['pernas','Pernas','footprints','s1'],['acessorios','Acessórios','witch-hat','s2']];
 const FX_UNLOCK_TXT = {s0:'o Rosto (olhos e boca)', s1:'braços e pernas', s2:'chapéus e caudas', s3:'óculos e acessórios de cabeça', s4:'acessórios de pescoço e asas', s5:'as capas'};
 const fresh = () => ({onboarded:false, done:{}, data:{}, mascot:{...DEFAULT_MASCOT}, fuxo:{...FX_DEFAULT}, slot:0, testMode:false});
+// Supabase: login com Google e trilha salva na conta (detalhes no bloco "cadastro", mais abaixo)
+const SB_URL = 'https://nsihzvwvqxswrodstwwl.supabase.co';
+const SB_KEY = 'sb_publishable_v3taz7jcoyn7FueS6iYQsA_Y7dILRuT';
+const sb = window.supabase && SB_KEY ? window.supabase.createClient(SB_URL, SB_KEY, {auth: {flowType: 'pkce'}}) : null;
+const remoteState = () => { const {slot, testMode, user, ...o} = S; return o; };   // horário e modo teste são do aparelho
+let pushT;
+function pushSoon(){ if(!sb || !S.user) return; clearTimeout(pushT); pushT = setTimeout(pushNow, 600); }
+function pushNow(){
+  clearTimeout(pushT); pushT = null; if(!sb || !S.user) return;
+  sb.from('trilhas').upsert({user_id: S.user.id, nome: S.user.name, email: S.user.email, estado: remoteState(), updated_at: new Date().toISOString()})
+    .then(({error}) => { if(error) console.warn('Supabase', error.message); });
+}
+document.addEventListener('visibilitychange', () => { if(document.hidden && pushT) pushNow(); });
 let S = load();
 function syncClock(){ if(!TEST_URL){ S.testMode = false; S.slot = liveSlot(); } }
 syncClock();
-function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const o = Object.assign(fresh(), JSON.parse(r)); o.mascot = {...DEFAULT_MASCOT, ...o.mascot}; o.fuxo = {...FX_DEFAULT, ...o.fuxo}; return o; } }catch(e){} return fresh(); }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); if(S.user && S.user.email){ const a = JSON.parse(localStorage.getItem('esquenta-contas-v1') || '{}'); a[S.user.email] = S; localStorage.setItem('esquenta-contas-v1', JSON.stringify(a)); } }catch(e){} }
+function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const o = Object.assign(fresh(), JSON.parse(r)); o.mascot = {...DEFAULT_MASCOT, ...o.mascot}; o.fuxo = {...FX_DEFAULT, ...o.fuxo}; if(o.user && !o.user.id) delete o.user; return o; } }catch(e){} return fresh(); }   // cadastro antigo (só e-mail): mantém o progresso e pede o login com Google
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} pushSoon(); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const actsOf = sid => ACTS.filter(a => a.slot === sid);
@@ -1134,45 +1135,40 @@ function enterTrail(){
   if(!S.done.checkin) setTimeout(() => complete('checkin'), 350);
 }
 
-/* ================= cadastro =================
-   Protótipo: as contas ficam guardadas neste aparelho (localStorage), por e-mail.
-   No produto real, esse cadastro vai para um servidor; aí dá para voltar à trilha em qualquer aparelho. */
-const ACCOUNTS = 'esquenta-contas-v1';
-const accounts = () => { try{ return JSON.parse(localStorage.getItem(ACCOUNTS)) || {}; }catch(e){ return {}; } };
-const normEmail = e => e.trim().toLowerCase();
-const okEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-let suLogin = false;
-function openSignup(login = false){
-  suLogin = login;
-  const su = $('#signup'); su.hidden = false; su.classList.toggle('is-login', login);
+/* ================= cadastro (Google via Supabase) =================
+   A trilha fica no aparelho (localStorage) e, com login, também na tabela "trilhas" do Supabase: dá para voltar em qualquer aparelho.
+   A chave publicável pode ficar no código; a tabela tem RLS (cada pessoa só lê e grava a própria linha). */
+// junta o aparelho com a conta: atividades feitas somam; o Fuxo vem da conta, a não ser que este aparelho já fosse dessa pessoa
+async function adoptUser(u){
+  const meta = u.user_metadata || {}, user = {id: u.id, name: meta.full_name || meta.name || u.email, email: u.email};
+  const {data: row, error} = await sb.from('trilhas').select('estado').eq('user_id', u.id).maybeSingle();
+  if(error) console.warn('Supabase', error.message);
+  const mine = !!S.user && S.user.id === u.id, local = S.user && !mine ? {...fresh(), onboarded: true} : S, r = row && row.estado;
+  S = Object.assign(fresh(), local);
+  if(r){
+    S.done = {...r.done, ...local.done}; S.data = {...r.data, ...local.data};
+    if(!mine){ S.fuxo = {...FX_DEFAULT, ...r.fuxo}; S.mascot = {...DEFAULT_MASCOT, ...r.mascot}; }
+  }
+  S.onboarded = true; S.user = user; syncClock(); save();
+  return {back: !!r};
+}
+function openSignup(){
+  const su = $('#signup'); su.hidden = false;
   if(!su.querySelector('.blob')) su.querySelector('.trail-bg').insertAdjacentHTML('afterbegin', BLOBS); bakeAll();
-  $('#su-title').textContent = login ? 'Bem-vindo de volta!' : 'Crie seu acesso';
-  $('#su-sub').textContent = login ? 'Digite o e-mail que você usou' : 'Para não perder seu progresso, e nem seu Fuxo';
-  $('#su-cta').firstChild.textContent = login ? 'Entrar' : 'Começar a trilha';
-  $('#su-switch').textContent = login ? 'Ainda não tenho acesso' : 'Já criei meu acesso';
-  ['name','email'].forEach(k => { $('#su-' + k).removeAttribute('aria-invalid'); $('#su-' + k + '-err').textContent = ''; });
+  suBusy(false); $('#su-err').textContent = '';
   fxLoad().then(() => { const cv = $('#su-fuxo'), m = S.fuxo || FX_DEFAULT, [bx, by, bw, bh] = fxBBox(m), sz = Math.max(bw, bh) + 40; fxRender(cv, m, {crop:[bx + bw/2 - sz/2, by + bh/2 - sz/2, sz, sz]}); });
   $('#su-title').focus();
 }
-function suError(k, msg){ const i = $('#su-' + k); i.setAttribute('aria-invalid', msg ? 'true' : 'false'); $('#su-' + k + '-err').textContent = msg; return !msg; }
-['name','email'].forEach(k => $('#su-' + k).addEventListener('input', () => { if($('#su-' + k).getAttribute('aria-invalid') === 'true') suError(k, ''); }));
-$('#su-switch').onclick = () => openSignup(!suLogin);
-$('#su-form').onsubmit = e => {
-  e.preventDefault();
-  const name = $('#su-name').value.trim().replace(/\s+/g, ' '), email = normEmail($('#su-email').value);
-  let ok = true;
-  if(!suLogin){ ok = suError('name', !name ? 'Digite seu nome e sobrenome' : name.split(' ').length < 2 ? 'Inclua também o sobrenome' : '') && ok; }
-  ok = suError('email', !email ? 'Digite seu e-mail' : !okEmail(email) ? 'Confira o e-mail: parece que falta algo (ex.: voce@email.com)' : '') && ok;
-  if(!ok){ (document.querySelector('#su-form [aria-invalid="true"]'))?.focus(); return; }
-  const acc = accounts();
-  if(suLogin){
-    if(!acc[email]){ suError('email', 'Não encontramos uma trilha com esse e-mail. Confira ou crie um acesso.'); $('#su-email').focus(); return; }
-    S = Object.assign(fresh(), acc[email]); S.onboarded = true; save();
-    toast(`Que bom te ver de novo, ${S.user.name.split(' ')[0]}!`); enterTrail(); return;
-  }
-  if(acc[email]){ suError('email', 'Esse e-mail já tem uma trilha. Toque em "Já criei meu acesso" para entrar.'); $('#su-email').focus(); return; }
-  S.user = {name, email}; save(); enterTrail();
+function suBusy(on){ $('#su-cta').disabled = on; $('#su-cta span').textContent = on ? 'Abrindo o Google…' : 'Continuar com Google'; }
+$('#su-cta').onclick = async () => {
+  if(!sb){ $('#su-err').textContent = 'O login ainda não está configurado.'; return; }
+  suBusy(true); $('#su-err').textContent = '';
+  // volta para este mesmo endereço (mantém o ?teste); a URL precisa estar na lista de redirecionamento do Supabase
+  const {error} = await sb.auth.signInWithOAuth({provider: 'google', options: {redirectTo: location.origin + location.pathname + location.search, queryParams: {prompt: 'select_account'}}});
+  if(error){ suBusy(false); $('#su-err').textContent = 'Não deu para abrir o login do Google. Tente de novo.'; }
 };
+// ao voltar com o botão "voltar" do navegador, a página pode vir do cache com o botão travado em "Abrindo…"
+window.addEventListener('pageshow', e => { if(e.persisted) suBusy(false); });
 
 /* ================= barra de progresso do evento ================= */
 // A barra mostra em que momento o EVENTO está (Figma 2045:53): marcos passados em laranja, o atual com anel.
@@ -1265,7 +1261,7 @@ function renderTrilha(){
   if(TEST_URL){
   $('#demo-slot').onchange = e => { S.slot = +e.target.value; save(); renderTrilha(); };
   $('#demo-unlock').onchange = e => { S.testMode = e.target.checked; save(); renderTrilha(); };
-  $('#demo-reset').onclick = () => { S = fresh(); save(); boot(); };
+  $('#demo-reset').onclick = async () => { clearTimeout(pushT); pushT = null; if(sb) await sb.auth.signOut(); S = fresh(); save(); boot(); };
   $('#demo-tutorial').onclick = () => { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; };
   }
   $('#avatar').onclick = openEditor;
@@ -2314,7 +2310,13 @@ function boot(){
   else if(S.onboarded){ $('#onboarding').hidden = true; $('#main').hidden = false; renderTrilha(); }
   else { obStep = 0; renderOB(); $('#main').hidden = true; $('#onboarding').hidden = false; }
 }
-boot();
+// na volta do Google o endereço traz ?code=: o Supabase troca pela sessão antes do primeiro desenho
+(sb ? sb.auth.getSession().then(({data}) => data.session, () => null) : Promise.resolve(null))
+  .then(async session => {
+    const wasIn = !!S.user, res = session ? await adoptUser(session.user).catch(e => { console.warn(e); return null; }) : null;
+    boot();
+    if(res && !wasIn) toast(res.back ? `Que bom te ver de novo, ${S.user.name.split(' ')[0]}!` : `Trilha salva na sua conta, ${S.user.name.split(' ')[0]}!`);
+  });
 // a cada 30 s confere se começou um novo momento da programação e libera as atividades dele
 setInterval(() => { if(TEST_URL) return; const k = liveSlot(); if(k !== S.slot){ S.slot = k; save(); if(!$('#main').hidden) renderTrilha(); } }, 30000);
 })();
