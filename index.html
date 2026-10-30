@@ -90,29 +90,33 @@ button{cursor:pointer}
 @keyframes ob-glow{0%,100%{box-shadow:0 0 0 rgba(255,45,3,0)}40%{box-shadow:0 0 12px rgba(255,45,3,.8)}}
 .ob-progress span.unfill::before{transition:transform .45s cubic-bezier(.4,0,.2,1)}   /* voltar: recolhe suave para a esquerda (o caminho inverso do encher) */
 @media (prefers-reduced-motion:reduce){.ob-progress span::before{transition:none}.ob-progress span.fill{animation:none}}
-.ob-body{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 20px 12px;scrollbar-width:none}
+.ob-body{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;text-align:center;padding:16px 20px;scrollbar-width:thin}
+.ob-content{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:353px;flex:0 0 auto}
+.ob-content>*{flex-shrink:0;max-width:100%}
 .ob-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);text-wrap:balance;font-variation-settings:"opsz" 14}
+.ob-content>.ob-sub{margin:0}
 .ob-sub{margin:10px 0 0;font-family:var(--f-dm);font-weight:500;font-size:17px;line-height:1.35;color:var(--fg);max-width:270px}
-.ob-text{margin:auto 0 0;padding-top:24px;font-family:var(--f-dm);font-weight:500;font-size:16px;line-height:1.4;color:var(--fg);max-width:340px;text-wrap:balance}
+.ob-text{margin:0;font-family:var(--f-dm);font-weight:500;font-size:16px;line-height:1.4;color:var(--fg);max-width:340px;text-wrap:balance}
 .ob-text b{font-weight:800}
-.ob-art{width:100%;display:flex;flex-direction:column;align-items:center;margin-top:28px}
+.ob-art{width:100%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:16px}
+.ob-art>*{flex-shrink:0}
 /* 1 · barra + pilha de cards */
 .ob-art .track{width:100%;pointer-events:none}
-.ob-stack{position:relative;width:100%;margin-top:34px;text-align:left}
+.ob-stack{position:relative;width:100%;margin:0 0 28px;text-align:left}
 .ob-stack::before,.ob-stack::after{content:"";position:absolute;left:12px;right:12px;bottom:-14px;height:60px;border-radius:26px;background:rgba(0,0,0,.31);border:1px solid rgba(255,255,255,.08);z-index:-1}
 .ob-stack::after{left:24px;right:24px;bottom:-28px;opacity:.6}
 .ob-stack .stage-card{pointer-events:none}
 .ob-stack .act .chev{display:flex}
 /* 2 · Fuxo + abas da personalização */
 .ob-fuxo{width:300px;height:290px}
-.ob-cats{display:flex;gap:2px;margin-top:20px;padding:8px 6px;border-radius:14px;background:rgba(255,255,255,.06);pointer-events:none;box-sizing:border-box;width:100%;max-width:340px;isolation:isolate;-webkit-transform:translateZ(0);transform:translateZ(0)}
+.ob-cats{display:flex;gap:2px;padding:8px 6px;border-radius:14px;background:rgba(255,255,255,.06);pointer-events:none;box-sizing:border-box;width:100%;max-width:340px;isolation:isolate;-webkit-transform:translateZ(0);transform:translateZ(0)}
 /* cada aba divide o espaço por igual e nunca passa da largura da caixa, em qualquer largura de celular */
 .ob-cats .fx-cat{flex:1 1 0;min-width:0;font-size:9px;gap:4px}
 .ob-cats .fx-cat>span:last-child{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:clip;font-size:min(9px,2.4vw);letter-spacing:-.01em}
 .ob-cats .fx-cat .ic{width:38px;height:38px;border-radius:12px}
 .ob-cats .fx-cat .ic svg{width:18px;height:18px}
 /* 3 · dois stories sobrepostos */
-.ob-stories{position:relative;width:353px;max-width:100%;height:491px;margin-top:5px;flex:0 0 auto}
+.ob-stories{position:relative;width:353px;max-width:100%;height:491px;flex:0 0 auto}
 .ob-stories img{position:absolute;display:block}
 .ob-stories .s1{left:10px;top:0;width:196px;height:349px}
 .ob-stories .s2{left:131px;top:114px;width:212px;height:377px}
@@ -128,12 +132,6 @@ button{cursor:pointer}
 /* svh reserva o espaco ocupado pelas barras abertas do navegador mobile. */
 .stage{height:100vh;height:100svh}
 .ob-progress,.ob-foot{flex-shrink:0}
-.ob-body{justify-content:safe center;padding-block:24px;scrollbar-width:thin;overflow-x:hidden}
-.ob-body>*{flex-shrink:0;max-width:100%}
-.ob-art{min-width:0;max-width:353px}
-.ob-text{margin:0;padding-top:40px}
-/* Compensa os 28px das camadas decorativas abaixo do card. */
-.ob-art:has(.ob-stack)+.ob-text{margin-top:28px}
 .ob-fuxo{width:min(300px,100%);height:auto;aspect-ratio:30/29}
 .ob-stories{width:353px;height:auto;aspect-ratio:353/491}
 .ob-stories .s1{left:2.833%;top:0;width:55.524%;height:auto}
@@ -151,26 +149,19 @@ button{cursor:pointer}
   .ob-cats .fx-cat .ic{width:32px;height:32px}
 }
 @container phone (max-height:740px){
-  .ob-body{padding-top:16px}
   .ob-body h1{font-size:26px}
-  .ob-art{margin-top:16px}
-  .ob-stack{margin-top:16px}
   .ob-stack .stage-card{padding:12px}
   .ob-stack .stage-head{margin-bottom:6px}
   .ob-stack .acts{margin-top:8px;gap:6px}
   .ob-stack .act{min-height:48px;padding:8px 10px;gap:8px}
-  .ob-text{padding-top:34px;font-size:15px;line-height:1.35}
+  .ob-text{font-size:15px;line-height:1.35}
   .ob-fuxo{width:min(230px,100%)}
   .ob-stories{width:min(285px,100%)}
-  .ob-cats{margin-top:12px}
   .ob-foot{padding-top:12px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 }
 @container phone (max-height:580px){
-  .ob-body{padding-top:16px}
   .ob-body h1{font-size:24px}
   .ob-sub{font-size:15px}
-  .ob-art{margin-top:12px}
-  .ob-stack{margin-top:12px}
   .ob-stack .act{min-height:44px;padding-block:6px}
   .ob-stack .act-title{font-size:14px}
   .ob-fuxo{width:min(180px,100%)}
@@ -1192,7 +1183,7 @@ async function obStory(cv, withFx){
 function renderOB(){
   const st = OB[obStep];
   $('#ob-body').scrollTop = 0;
-  $('#ob-body').innerHTML = `<h1 tabindex="-1" id="ob-title">${st.title}</h1>${st.sub ? `<p class="ob-sub">${st.sub}</p>` : ''}<div class="ob-art">${st.art()}</div>${st.text ? `<p class="ob-text">${st.text}</p>` : ''}`;
+  $('#ob-body').innerHTML = `<div class="ob-content"><h1 tabindex="-1" id="ob-title">${st.title}</h1>${st.sub ? `<p class="ob-sub">${st.sub}</p>` : ''}<div class="ob-art">${st.art()}</div>${st.text ? `<p class="ob-text">${st.text}</p>` : ''}</div>`;
   [...$('#ob-progress').children].forEach((el,i) => {
     const on = i <= obStep, was = el.classList.contains('on');
     el.classList.remove('fill', 'unfill');
