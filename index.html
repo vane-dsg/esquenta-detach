@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -125,7 +125,8 @@ button{cursor:pointer}
 .ob-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
 /* Onboarding responde ao tamanho real da moldura, inclusive em landscape. */
 .phone{container:phone / size}
-.stage{height:100dvh}
+/* svh reserva o espaco ocupado pelas barras abertas do navegador mobile. */
+.stage{height:100vh;height:100svh}
 .ob-progress,.ob-foot{flex-shrink:0}
 .ob-body{padding-top:clamp(20px,6cqh,56px);scrollbar-width:thin;overflow-x:hidden}
 .ob-body>*{flex-shrink:0;max-width:100%}
@@ -148,10 +149,15 @@ button{cursor:pointer}
   .ob-cats .fx-cat .ic{width:32px;height:32px}
 }
 @container phone (max-height:740px){
-  .ob-body{padding-top:24px}
-  .ob-art{margin-top:20px}
-  .ob-stack{margin-top:20px}
-  .ob-text{padding-top:36px;font-size:15px}
+  .ob-body{padding-top:16px}
+  .ob-body h1{font-size:26px}
+  .ob-art{margin-top:16px}
+  .ob-stack{margin-top:16px}
+  .ob-stack .stage-card{padding:12px}
+  .ob-stack .stage-head{margin-bottom:6px}
+  .ob-stack .acts{margin-top:8px;gap:6px}
+  .ob-stack .act{min-height:48px;padding:8px 10px;gap:8px}
+  .ob-text{padding-top:34px;font-size:15px;line-height:1.35}
   .ob-fuxo{width:min(230px,100%)}
   .ob-stories{width:min(285px,100%)}
   .ob-cats{margin-top:12px}
@@ -161,7 +167,10 @@ button{cursor:pointer}
   .ob-body{padding-top:16px}
   .ob-body h1{font-size:24px}
   .ob-sub{font-size:15px}
-  .ob-stack .act{min-height:48px;padding-block:8px}
+  .ob-art{margin-top:12px}
+  .ob-stack{margin-top:12px}
+  .ob-stack .act{min-height:44px;padding-block:6px}
+  .ob-stack .act-title{font-size:14px}
   .ob-fuxo{width:min(180px,100%)}
   .ob-stories{width:min(220px,100%)}
 }
