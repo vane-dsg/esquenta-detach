@@ -29,7 +29,7 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-html{height:100%}
+html{height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{height:100%;margin:0;background-color:#07040C;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.3px);background-size:22px 22px;color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -105,8 +105,9 @@ button{cursor:pointer}
 .ob-stack .act .chev{display:flex}
 /* 2 · Fuxo + abas da personalização */
 .ob-fuxo{width:300px;height:290px}
-.ob-cats{display:flex;gap:4px;margin-top:20px;padding:8px;border-radius:14px;background:rgba(255,255,255,.06);pointer-events:none}
-.ob-cats .fx-cat{flex:0 0 46px;font-size:9px;gap:4px}
+.ob-cats{display:flex;gap:4px;margin-top:20px;padding:8px;border-radius:14px;background:rgba(255,255,255,.06);pointer-events:none;flex:0 0 auto;width:max-content;isolation:isolate;-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-backface-visibility:hidden}
+.ob-cats .fx-cat span:last-child,.ob-cats .fx-cat{white-space:nowrap}
+.ob-cats .fx-cat{flex:0 0 52px;font-size:9px;gap:4px}
 .ob-cats .fx-cat .ic{width:38px;height:38px;border-radius:12px}
 .ob-cats .fx-cat .ic svg{width:18px;height:18px}
 /* 3 · dois stories sobrepostos */
