@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -123,6 +123,48 @@ button{cursor:pointer}
 .ob-next{background:#FF2D03;color:#fff;box-shadow:0 10px 24px -10px rgba(255,45,3,.8)}
 .ob-btn:active{transform:scale(.97)}
 .ob-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* Onboarding responde ao tamanho real da moldura, inclusive em landscape. */
+.phone{container:phone / size}
+.stage{height:100dvh}
+.ob-progress,.ob-foot{flex-shrink:0}
+.ob-body{padding-top:clamp(20px,6cqh,56px);scrollbar-width:thin;overflow-x:hidden}
+.ob-body>*{flex-shrink:0;max-width:100%}
+.ob-art{min-width:0;max-width:353px}
+.ob-text{padding-top:40px}
+.ob-fuxo{width:min(300px,100%);height:auto;aspect-ratio:30/29}
+.ob-stories{width:353px;height:auto;aspect-ratio:353/491}
+.ob-stories .s1{left:2.833%;top:0;width:55.524%;height:auto}
+.ob-stories .s2{left:37.11%;top:23.218%;width:60.057%;height:auto}
+.ob-foot{gap:12px;padding:16px 20px calc(clamp(16px,5cqh,56px) + env(safe-area-inset-bottom,0px))}
+.ob-btn{justify-content:center;flex-shrink:0;padding-inline:20px}
+@container phone (max-width:340px){
+  .ob-body{padding-inline:16px}
+  .ob-body h1{font-size:25px}
+  .ob-foot{padding-inline:16px;gap:8px}
+  .ob-btn{font-size:14px;padding-inline:16px;gap:8px}
+  .ob-stack .stage-card{padding:12px}
+  .ob-stack .act{padding:10px;gap:8px}
+  .ob-cats{padding-inline:2px}
+  .ob-cats .fx-cat .ic{width:32px;height:32px}
+}
+@container phone (max-height:740px){
+  .ob-body{padding-top:24px}
+  .ob-art{margin-top:20px}
+  .ob-stack{margin-top:20px}
+  .ob-text{padding-top:36px;font-size:15px}
+  .ob-fuxo{width:min(230px,100%)}
+  .ob-stories{width:min(285px,100%)}
+  .ob-cats{margin-top:12px}
+  .ob-foot{padding-top:12px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+}
+@container phone (max-height:580px){
+  .ob-body{padding-top:16px}
+  .ob-body h1{font-size:24px}
+  .ob-sub{font-size:15px}
+  .ob-stack .act{min-height:48px;padding-block:8px}
+  .ob-fuxo{width:min(180px,100%)}
+  .ob-stories{width:min(220px,100%)}
+}
 /* ---------- cadastro (mesmos componentes do onboarding) ---------- */
 .su-body{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(40px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
 .su-body h1{margin:0;font-family:var(--f-brico);font-weight:800;font-size:28px;line-height:1.25;color:var(--fg);font-variation-settings:"opsz" 14}
@@ -1138,6 +1180,7 @@ async function obStory(cv, withFx){
 }
 function renderOB(){
   const st = OB[obStep];
+  $('#ob-body').scrollTop = 0;
   $('#ob-body').innerHTML = `<h1 tabindex="-1" id="ob-title">${st.title}</h1>${st.sub ? `<p class="ob-sub">${st.sub}</p>` : ''}<div class="ob-art">${st.art()}</div>${st.text ? `<p class="ob-text">${st.text}</p>` : ''}`;
   [...$('#ob-progress').children].forEach((el,i) => {
     const on = i <= obStep, was = el.classList.contains('on');
