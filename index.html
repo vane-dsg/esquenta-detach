@@ -1073,6 +1073,13 @@ function pushNow(){
     .then(({error}) => { if(error) console.warn('Supabase', error.message); });
 }
 document.addEventListener('visibilitychange', () => { if(document.hidden && pushT) pushNow(); });
+// respostas: uma linha por pessoa + atividade na tabela "respostas" (fácil de consultar e exportar); upsert, então repetir não duplica
+function pushRespostas(ids){
+  if(!sb || !S.user) return;
+  const rows = ids.map(id => ACTS.find(a => a.id === id)).filter(a => a && a.type !== 'auto' && S.done[a.id] && S.data[a.id])
+    .map(a => ({user_id: S.user.id, atividade: a.id, titulo: a.title, tipo: a.type, resposta: S.data[a.id], updated_at: new Date().toISOString()}));
+  if(rows.length) sb.from('respostas').upsert(rows).then(({error}) => { if(error) console.warn('Supabase', error.message); });
+}
 let S = load();
 function syncClock(){ if(!TEST_URL){ S.testMode = false; S.slot = liveSlot(); } }
 syncClock();
@@ -1224,6 +1231,7 @@ async function adoptUser(u){
     if(!mine){ S.fuxo = {...FX_DEFAULT, ...r.fuxo}; S.mascot = {...DEFAULT_MASCOT, ...r.mascot}; }
   }
   S.onboarded = true; S.user = user; syncClock(); save();
+  pushRespostas(Object.keys(S.done));   // o que foi respondido antes do login (ou em outro aparelho) também vai para a tabela
   return {back: !!r};
 }
 function openSignup(){
@@ -1414,7 +1422,7 @@ function complete(id){
   const a = ACTS.find(x => x.id === id);
   if(!a || S.done[id]) return;
   const before = marcos();
-  S.done[id] = true; save();
+  S.done[id] = true; save(); pushRespostas([id]);
   renderTrilha();
   const after = marcos();
   // momento inteiro concluído → tela de recompensa com o que foi liberado
