@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12091C">
+<meta name="robots" content="noindex">
+<title>Resultados · Esquenta Detach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Resultados da trilha, no espírito do Google Forms: um cartão por pergunta, com gráficos.
+   Mesmos tokens do index.html. Aberta sem login: lê as respostas pela função resultados() do Supabase, que não diz quem respondeu (supabase/resultados.sql). */
+:root{
+  --night:#0B0613; --surface:rgba(26,15,38,.72); --surface-strong:#1B1128; --surface-hi:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.28);
+  --fg:#F7F2FB; --muted:#BDB1CC; --dim:#8E829F;
+  --orange:#FF2D03; --purple:#8740E9; --magenta:#D430A8;
+  --grad:linear-gradient(100deg,#FF4B27 0%,#D430A8 52%,#8740E9 100%);
+  --success:#3DDC97; --danger:#FF8A7A;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--night);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+/* fundo fixo igual ao das telas do app: manchas desfocadas (laranja, rosa, roxo) → véu escuro → textura em color-dodge */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;isolation:isolate;background:var(--night)}
+.bg i{position:absolute;width:760px;height:760px;border-radius:50%}
+.bg i:nth-child(1){left:-380px;top:-200px;opacity:.55;background:radial-gradient(closest-side,#FF4B27 20%,#FF4B2780 60%,#FF4B2700 100%)}
+.bg i:nth-child(2){right:-360px;top:-260px;opacity:.6;background:radial-gradient(closest-side,#8740E9 20%,#8740E980 60%,#8740E900 100%)}
+.bg i:nth-child(3){right:-300px;top:38%;opacity:.7;background:radial-gradient(closest-side,#FF4FFE 20%,#FF4FFE80 60%,#FF4FFE00 100%)}
+.bg i:nth-child(4){left:-340px;bottom:-320px;opacity:.6;background:radial-gradient(closest-side,#8740E9 20%,#8740E980 60%,#8740E900 100%)}
+.bg i:nth-child(5){left:30%;bottom:-420px;opacity:.38;background:radial-gradient(closest-side,#D430A8 20%,#D430A880 60%,#D430A800 100%)}
+.bg::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,6,19,.3) 0%,rgba(11,6,19,.62) 45%,rgba(11,6,19,.8) 100%)}
+.bg::after{content:"";position:absolute;inset:0;z-index:2;opacity:.28;mix-blend-mode:color-dodge;background:url("assets/textura-figma-3x.jpg") center/cover}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:#FFB199}
+:focus-visible{outline:3px solid #FFB199;outline-offset:2px}
+.wrap{max-width:780px;margin:0 auto;padding:32px 16px}
+.head{padding:4px 4px 8px}
+#app,#resumo{display:flex;flex-direction:column;gap:12px}
+
+/* ---------- cards: vidro líquido do app (stage-card / tab bar) ---------- */
+.card{border-radius:26px;border:1px solid var(--line);background:rgba(0,0,0,.31);-webkit-backdrop-filter:blur(11px);backdrop-filter:blur(11px);padding:22px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,5vw,34px);line-height:1.1;margin:4px 0 6px;font-variation-settings:"opsz" 14}
+.sub{margin:0;color:var(--muted)}
+.big{font-family:var(--f-display);font-weight:800;font-size:22px}
+
+/* ---------- pergunta ---------- */
+.eyebrow{margin:0;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#FFB199}
+.q-title{font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1.2;margin:4px 0 2px;font-variation-settings:"opsz" 14}
+.q-desc{margin:0;color:var(--muted);font-size:14px}
+.q-count{margin:6px 0 16px;font-size:13px;color:var(--dim)}
+.sub-q{font-weight:800;font-size:15px;margin:22px 0 10px}
+.sub-q:first-of-type{margin-top:4px}
+.empty{color:var(--dim);font-size:14px;margin:0}
+
+/* barras horizontais */
+.bars{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.bars li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.bars .lbl{font-size:14px;font-weight:600}
+.bars .val{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars .track{grid-column:1 / -1;height:8px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}
+.bars .fill{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#FF2D03,#D430A8)}
+.bars li.ok .fill{background:var(--success)}
+.bars li.ok .lbl::after{content:" · resposta certa";color:var(--success);font-weight:800;font-size:12px}
+
+/* pizza */
+.pie{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.donut{position:relative;width:160px;height:160px;flex:none}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+/* fatia em destaque: sai um pouco do anel (na direção do meio dela) e engrossa, como no Google Forms */
+.donut circle[data-k]{cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),stroke-width .35s cubic-bezier(.2,.8,.2,1),opacity .25s ease}
+.donut circle.hot{transform:translate(var(--dx),var(--dy));stroke-width:9}
+/* centro do anel: total, ou a porcentagem da fatia em destaque */
+.donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.donut-c b{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1;font-variation-settings:"opsz" 14;font-variant-numeric:tabular-nums}
+.donut-c span{font-size:11px;color:var(--muted);margin-top:4px}
+.legend{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none;flex:1;min-width:200px}
+.legend li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px;padding:6px 10px;margin:0 -10px;border-radius:12px;cursor:pointer;transition:background-color .2s ease,opacity .25s ease}
+.legend li.hot{background:rgba(255,255,255,.08)}
+.legend i{width:12px;height:12px;border-radius:4px}
+.legend .val{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+
+/* colunas (escala 1–5) */
+.cols{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:170px;padding-top:24px}
+.col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.col .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.col .c{width:100%;max-width:56px;border-radius:10px 10px 4px 4px;background:var(--grad);min-height:3px;transform-origin:50% 100%;transition:transform .7s cubic-bezier(.2,.8,.2,1) calc(var(--i,0) * 60ms)}
+.col .k{font-weight:800;font-size:14px}
+.avg{display:flex;align-items:baseline;gap:8px;margin:0 0 6px}
+.avg span:not(.big){color:var(--muted);font-size:13px}
+
+/* destaque na pizza: a fatia em foco fica cheia, o resto recua */
+.chart.has-hot [data-k]:not(.hot){opacity:.35}
+
+/* entrada: os gráficos "enchem" quando o cartão aparece na tela */
+.bars .fill{transform-origin:0 50%;transition:transform .7s cubic-bezier(.2,.8,.2,1) calc(var(--i,0) * 60ms)}
+.card:not(.in) .bars .fill{transform:scaleX(0)}
+.card:not(.in) .col .c{transform:scaleY(0)}
+.donut svg{transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .5s ease}
+.card:not(.in) .donut svg{transform:rotate(-200deg) scale(.7);opacity:0}
+
+/* dica flutuante: vidro líquido, igual à gaveta e à tab bar do app */
+.tip{position:fixed;left:0;top:0;z-index:50;pointer-events:none;min-width:140px;max-width:260px;padding:10px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(20,11,34,.55);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:0 18px 40px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12);opacity:0;transform:translate(var(--x),var(--y)) scale(.92);transform-origin:var(--ox,50%) 100%;transition:opacity .18s ease,transform .18s cubic-bezier(.2,.8,.2,1)}
+.tip.on{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}
+.tip p{margin:0;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.tip p i{width:10px;height:10px;border-radius:3px;flex:none}
+.tip b{display:block;margin-top:2px;font-family:var(--f-display);font-weight:800;font-size:18px;font-variation-settings:"opsz" 14;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){ .tip,.donut svg,.donut circle[data-k],.bars .fill,.col .c{transition:none!important} .card:not(.in) .bars .fill,.card:not(.in) .col .c,.card:not(.in) .donut svg{transform:none;opacity:1} }
+
+/* textos livres */
+.texts{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;max-height:320px;overflow:auto}
+.texts li{background:var(--surface-hi);border-radius:12px;padding:10px 12px;font-size:14px;overflow-wrap:anywhere}
+.texts small{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+
+.demo-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:#FFC23D;color:#1d1300;border-radius:999px;padding:3px 10px}
+@media (max-width:520px){ .card{padding:18px;border-radius:18px} .donut{width:132px;height:132px} .cols{height:150px} }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div class="tip" id="tip" role="status" aria-live="polite"><p><i></i><span></span></p><b></b></div>
+<div class="wrap">
+
+  <!-- carregando -->
+  <p class="sub" id="loading" role="status">Carregando…</p>
+
+  <!-- resultados -->
+  <main id="app" hidden>
+    <header class="head">
+      <p class="eyebrow" id="demo-tag" hidden><span class="demo-tag">Dados de exemplo</span></p>
+      <h1>Trilha Esquenta Detach</h1>
+      <p class="sub"><span class="big" id="total">0</span> <span id="total-lbl">respostas</span> · <span id="updated"></span></p>
+    </header>
+    <section id="resumo"></section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// mesmas perguntas do index.html (const ACTS): se mudar uma pergunta ou opção lá, atualize aqui também
+const ACTS = [
+  {id:'monstro', type:'single', label:'Escolha rápida', title:'Monstro do design', desc:'Qual monstro do design é você?', options:['Fantasma do pixel perfeito','Vampiro do feedback','Zumbi do Figma às 3h da manhã','Bruxa dos protótipos','Lobisomem do "só mais um ajuste"']},
+  {id:'conexao', type:'multi', label:'Networking', title:'Conexão no coffee', desc:'Converse com alguém que você ainda não conhece e marque o que vocês têm em comum.', options:['Usamos IA no trabalho','Somos da mesma área','Primeira vez num evento Detach','Já fizemos um portfólio com IA']},
+  {id:'gostosura', type:'single', label:'Enquete', title:'Gostosura ou IAlucinação?', desc:'A IA no seu trabalho tem sido mais gostosura (ajudou de verdade) ou IAlucinação (atrapalhou)?', options:['Gostosura','IAlucinação']},
+  {id:'medo', type:'single', label:'Enquete', title:'Seu maior medo com IA no design', desc:'Escolha a opção mais próxima do que você sente.', options:['Tudo ficar igual','Perder meu lugar','A IA alucinar no meio do projeto','Não tenho medo']},
+  {id:'mito', type:'quiz', label:'Quiz', title:'Mito ou verdade?', desc:'Uma resposta por frase.', items:[
+    {q:'Um agente de IA bom não precisa de revisão humana.', a:'Mito'},
+    {q:'Dar mais contexto ao agente costuma melhorar o resultado.', a:'Verdade'},
+    {q:'Harness é só um prompt bem escrito.', a:'Mito'}]},
+  {id:'exorcize', type:'multi', label:'Escolha rápida', title:'Exorcize o agente', desc:'Os 2 melhores guardrails para um agente que está fazendo besteira.', options:['Revisão humana antes de publicar','Limitar as ferramentas que ele pode usar','Dar mais contexto','Definir quando ele deve parar','Testar com casos reais']},
+  {id:'pocao', type:'multi', label:'Escolha rápida', title:'Poção do Detach', desc:'3 ingredientes para levar para o evento principal.', options:['Repertório','Networking','Ferramentas de IA','Portfólio','Oportunidades','Inspiração']},
+  {id:'invocando', type:'checklist', label:'Checklist', title:'Invocando meu portfólio', desc:'Passos do ritual concluídos no workshop.', items:['Invoquei o layout','Dei vida ao conteúdo','Criei o repositório','Publiquei no GitHub Pages']},
+  {id:'raiox', type:'raiox', label:'Feedback', title:'Raio-X do feitiço', desc:'Experiência invocando o portfólio.',
+    trav:['Não travei','Layout com IA','Conteúdo com IA','Criar o repositório','Publicar no GitHub Pages'], ajuda:['O passo a passo','Os prompts','A explicação','Não me ajudou']},
+  {id:'abobora', type:'rating', label:'Avaliação', title:'Quantas abóboras valem esse evento?', desc:'Nota de 1 a 5.'},
+];
+const CONF_TXT = ['Nada confiante','Pouco confiante','Mais ou menos','Confiante','Muito confiante'];
+const RATE_TXT = ['Não curti','Dá pra melhorar','Foi legal','Arrepiante de bom!','Amei, de arrepiar!'];
+const COLORS = ['#FF4B27','#8740E9','#D430A8','#FFC23D','#3DDC97','#73AAFF','#A79CF6'];
+
+const SB_URL = 'https://nsihzvwvqxswrodstwwl.supabase.co';
+const SB_KEY = 'sb_publishable_v3taz7jcoyn7FueS6iYQsA_Y7dILRuT';
+const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY, {auth: {persistSession: false}}) : null;
+const DEMO = new URLSearchParams(location.search).has('demo');   // ?demo: respostas inventadas (para testar a página)
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct = (n, t) => t ? Math.round(n / t * 100) : 0;
+const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+const safeUrl = u => { try{ const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; }catch(e){ return null; } };
+
+// pessoas (anônimas): [{r: {atividade: resposta}}]
+let people = [];
+
+function show(id){ ['loading','app'].forEach(k => $('#' + k).hidden = k !== id); }
+
+/* ================= dados ================= */
+async function fetchAll(){
+  const out = [], page = 1000;
+  for(let from = 0; ; from += page){
+    const {data, error} = await sb.rpc('resultados').range(from, from + page - 1);
+    if(error) throw error;
+    out.push(...data); if(data.length < page) return out;
+  }
+}
+async function loadData(){
+  const rows = DEMO ? demoData() : await fetchAll(), map = {};
+  rows.forEach(row => { (map[row.pessoa] || (map[row.pessoa] = {r: {}})).r[row.atividade] = row.resposta || {}; });
+  people = Object.values(map);
+}
+
+/* ================= gráficos ================= */
+// pizza: cada fatia e item da legenda carrega os dados da dica (data-l, data-v, data-c); data-k liga os dois
+const pct1 = (n, t) => t ? (n / t * 100).toFixed(1).replace('.', ',').replace(',0', '') : '0';
+const tipAttrs = (k, lbl, n, total, color) => `data-k="${k}" data-l="${esc(lbl)}" data-v="${n} (${pct1(n, total)}%)" data-c="${color}" tabindex="0"`;
+function bars(entries, total, ok){
+  return `<ul class="bars">${entries.map(([lbl, n], i) => `<li ${ok && ok === lbl ? 'class="ok"' : ''}><span class="lbl">${esc(lbl)}</span><span class="val">${n} (${pct(n, total)}%)</span>
+    <span class="track"><span class="fill" style="width:${pct(n, total)}%;--i:${i}"></span></span></li>`).join('')}</ul>`;
+}
+function pie(entries, total){
+  let acc = 0;
+  const arcs = entries.map(([lbl, n], i) => {
+    const p = total ? n / total * 100 : 0, mid = (acc + p / 2) / 100 * 2 * Math.PI, c = COLORS[i % COLORS.length];
+    const s = `<circle r="15.9155" cx="21" cy="21" fill="none" stroke="${c}" stroke-width="7" stroke-dasharray="${p} ${100 - p}" stroke-dashoffset="${-acc}" style="--dx:${(Math.cos(mid) * 1.6).toFixed(2)}px;--dy:${(Math.sin(mid) * 1.6).toFixed(2)}px" ${tipAttrs(i, lbl, n, total, c)}/>`;
+    acc += p; return p ? s : '';
+  }).join('');
+  return `<div class="pie chart" data-total="${total}"><div class="donut"><svg viewBox="0 0 42 42" role="img" aria-label="Gráfico de pizza"><circle r="15.9155" cx="21" cy="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>${arcs}</svg>
+    <div class="donut-c" aria-hidden="true"><b>${total}</b><span>${total === 1 ? 'resposta' : 'respostas'}</span></div></div>
+    <ul class="legend">${entries.map(([lbl, n], i) => `<li ${tipAttrs(i, lbl, n, total, COLORS[i % COLORS.length])}><i style="background:${COLORS[i % COLORS.length]}"></i><span>${esc(lbl)}</span><span class="val">${n} (${pct(n, total)}%)</span></li>`).join('')}</ul></div>`;
+}
+function cols(counts, labels){
+  const max = Math.max(1, ...counts), total = counts.reduce((a, b) => a + b, 0);
+  const avg = total ? counts.reduce((s, n, i) => s + n * (i + 1), 0) / total : 0;
+  return `<p class="avg"><span class="big">${avg.toFixed(1).replace('.', ',')}</span><span>média de ${plural(total, 'resposta', 'respostas')}</span></p>
+    <div class="cols" role="img" aria-label="${counts.map((n, i) => `${i + 1}: ${n}`).join(', ')}">${counts.map((n, i) => `<div class="col" title="${esc(labels[i])}"><span class="n">${n}</span><span class="c" style="height:${n / max * 100}%;--i:${i}"></span><span class="k">${i + 1}</span></div>`).join('')}</div>`;
+}
+function texts(list){
+  return list.length ? `<ul class="texts">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '<p class="empty">Ninguém escreveu nada ainda.</p>';
+}
+const tally = (opts, lists) => opts.map(o => [o, lists.filter(v => v.includes(o)).length]);
+
+/* ================= resumo ================= */
+function renderResumo(){
+  $('#resumo').innerHTML = ACTS.map(a => {
+    const rs = people.map(p => p.r[a.id]).filter(Boolean), n = rs.length;
+    let body = '';
+    if(!n) body = '<p class="empty">Nenhuma resposta ainda.</p>';
+    else switch(a.type){
+      case 'single': body = pie(a.options.map(o => [o, rs.filter(r => r.v === o).length]), n); break;
+      case 'multi': body = bars(tally(a.options, rs.map(r => r.v || [])), n); break;
+      case 'quiz': body = a.items.map((it, i) => {
+        const ans = rs.map(r => (r.answers || {})[i]).filter(Boolean);
+        return `<h3 class="sub-q">${i + 1}. ${esc(it.q)} <span class="q-count">· ${pct(ans.filter(x => x === it.a).length, ans.length)}% acertaram</span></h3>${bars(['Mito','Verdade'].map(o => [o, ans.filter(x => x === o).length]), ans.length, it.a)}`;
+      }).join(''); break;
+      case 'checklist': {
+        const links = rs.map(r => r.link).filter(Boolean);
+        body = bars(a.items.map((t, i) => [t, rs.filter(r => (r.checks || []).includes(i)).length]), n)
+          + `<h3 class="sub-q">Portfólios publicados (${links.length})</h3>`
+          + (links.length ? `<ul class="texts">${links.map(l => { const u = safeUrl(l); return `<li>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(l)}</a>` : esc(l)}</li>`; }).join('')}</ul>` : '<p class="empty">Nenhum link ainda.</p>');
+        break; }
+      case 'raiox':
+        body = `<h3 class="sub-q">Em que parte travou?</h3>${bars(tally(a.trav, rs.map(r => r.trav || [])), n)}
+          <h3 class="sub-q">O que mais ajudou?</h3>${bars(tally(a.ajuda, rs.map(r => r.ajuda || [])), n)}
+          <h3 class="sub-q">Confiança para atualizar o portfólio sozinho</h3>${cols([1,2,3,4,5].map(k => rs.filter(r => r.conf === k).length), CONF_TXT)}
+          <h3 class="sub-q">Comentários</h3>${texts(rs.map(r => r.text).filter(Boolean))}`;
+        break;
+      case 'rating':
+        body = cols([1,2,3,4,5].map(k => rs.filter(r => r.score === k).length), RATE_TXT)
+          + `<h3 class="sub-q">Comentários</h3>${texts(rs.map(r => r.text).filter(Boolean))}`;
+        break;
+    }
+    return `<article class="card"><p class="eyebrow">${esc(a.label)}</p><h2 class="q-title">${esc(a.title)}</h2><p class="q-desc">${esc(a.desc)}</p>
+      <p class="q-count">${plural(n, 'resposta', 'respostas')}</p>${body}</article>`;
+  }).join('');
+}
+
+/* ================= destaque e dica (mouse: ao passar; toque: ao tocar) ================= */
+const tip = $('#tip');
+let hot = null, pinned = false;
+function setHot(el, x, y){
+  if(hot !== el){
+    clearHot(true);
+    hot = el; const chart = el.closest('.chart'), k = el.dataset.k;
+    chart.classList.add('has-hot');
+    chart.querySelectorAll(`[data-k="${k}"]`).forEach(x => x.classList.add('hot'));
+    const c = chart.querySelector('.donut-c');
+    if(c){ c.querySelector('b').textContent = el.dataset.v.split('(')[1].replace(')', ''); c.querySelector('span').textContent = plural(+el.dataset.v.split(' ')[0], 'resposta', 'respostas'); }
+    tip.querySelector('i').style.background = el.dataset.c;
+    tip.querySelector('span').textContent = el.dataset.l;
+    tip.querySelector('b').textContent = el.dataset.v;
+  }
+  placeTip(x, y); tip.classList.add('on');
+}
+function placeTip(x, y){
+  const w = tip.offsetWidth, h = tip.offsetHeight, m = 12;
+  const left = Math.max(m, Math.min(innerWidth - w - m, x - w / 2));
+  const below = y - h - 14 < m;   // sem espaço em cima: mostra embaixo do dedo/cursor
+  tip.style.setProperty('--x', left + 'px');
+  tip.style.setProperty('--y', (below ? y + 18 : y - h - 14) + 'px');
+  tip.style.setProperty('--ox', (x - left) + 'px');
+}
+function clearHot(keepTip){
+  if(!hot) return;
+  const chart = hot.closest('.chart');
+  chart.classList.remove('has-hot');
+  chart.querySelectorAll('.hot').forEach(x => x.classList.remove('hot'));
+  const c = chart.querySelector('.donut-c');
+  if(c){ const t = +chart.dataset.total; c.querySelector('b').textContent = t; c.querySelector('span').textContent = t === 1 ? 'resposta' : 'respostas'; }
+  hot = null; pinned = false;
+  if(!keepTip) tip.classList.remove('on');
+}
+const centerOf = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + Math.min(r.height / 2, 24)]; };
+document.addEventListener('pointermove', e => {
+  if(e.pointerType !== 'mouse' || pinned) return;
+  const el = e.target.closest('#resumo [data-k]');
+  if(el) setHot(el, e.clientX, e.clientY); else clearHot();
+});
+// toque: tocar mostra e fixa a dica; tocar de novo no mesmo item, ou fora, fecha
+document.addEventListener('click', e => {
+  const el = e.target.closest('#resumo [data-k]');
+  if(!el){ clearHot(); return; }
+  if(e.pointerType === 'mouse'){ pinned = false; return; }
+  if(hot === el && pinned){ clearHot(); return; }
+  setHot(el, ...(e.clientX || e.clientY ? [e.clientX, e.clientY] : centerOf(el))); pinned = true;
+});
+// teclado: Tab passa pelos itens e mostra a mesma dica
+document.addEventListener('focusin', e => { const el = e.target.closest('#resumo [data-k]'); if(el) setHot(el, ...centerOf(el)); });
+document.addEventListener('focusout', e => { if(e.target.closest('#resumo [data-k]')) clearHot(); });
+addEventListener('scroll', () => { if(hot) clearHot(); }, {passive: true});
+
+// entrada: cada cartão anima os gráficos quando aparece na tela
+function reveal(){
+  document.querySelectorAll('#resumo .card:not(.in)').forEach(c => { if(c.getBoundingClientRect().top < innerHeight * .85) c.classList.add('in'); });
+}
+let revealT = 0;
+addEventListener('scroll', () => { clearTimeout(revealT); revealT = setTimeout(reveal, 30); }, {passive: true});
+addEventListener('resize', reveal);
+
+function renderAll(){
+  $('#total').textContent = people.length;
+  $('#total-lbl').textContent = people.length === 1 ? 'pessoa respondeu' : 'pessoas responderam';
+  $('#updated').textContent = `atualizado às ${new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+  renderResumo();
+  setTimeout(reveal, 60);   // espera o primeiro desenho para a transição acontecer
+}
+
+async function start(){
+  show('loading');
+  if(DEMO) $('#demo-tag').hidden = false;
+  else if(!sb){ $('#loading').textContent = 'Não deu para carregar o Supabase. Confira a internet e recarregue.'; return; }
+  try{ await loadData(); }catch(e){ console.warn(e); $('#loading').textContent = 'Não deu para carregar as respostas. Recarregue a página.'; return; }
+  renderAll(); show('app');
+}
+
+/* ================= dados de exemplo (?demo) ================= */
+function demoData(){
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = arr => arr[Math.floor(rnd() * arr.length)];
+  const some = (arr, k) => [...arr].sort(() => rnd() - .5).slice(0, k);
+  const coment = ['O passo a passo salvou!', 'Queria mais tempo no workshop', 'Amei a vibe de Halloween', 'Os prompts foram muito úteis', 'Faltou café 😅', 'Melhor evento do ano'];
+  const rows = [];
+  for(let pessoa = 1; pessoa <= 18; pessoa++){
+    const feitas = 3 + Math.floor(rnd() * (ACTS.length - 2));
+    ACTS.slice(0, feitas).forEach(a => {
+      let r;
+      switch(a.type){
+        case 'single': r = {v: pick(a.options)}; break;
+        case 'multi': r = {v: some(a.options, a.id === 'pocao' ? 3 : a.id === 'exorcize' ? 2 : 1 + Math.floor(rnd() * 3))}; break;
+        case 'quiz': r = {answers: Object.fromEntries(a.items.map((it, k) => [k, rnd() < .72 ? it.a : (it.a === 'Mito' ? 'Verdade' : 'Mito')]))}; break;
+        case 'checklist': { const c = [0, 1, 2, 3].filter(k => k < 3 || rnd() < .6); r = {checks: c, link: c.includes(3) ? `https://pessoa${pessoa}.github.io/portfolio` : undefined}; break; }
+        case 'raiox': r = {trav: rnd() < .3 ? ['Não travei'] : some(a.trav.slice(1), 1 + Math.floor(rnd() * 2)), ajuda: some(a.ajuda.slice(0, 3), 1 + Math.floor(rnd() * 2)), conf: 2 + Math.floor(rnd() * 4), text: rnd() < .4 ? pick(coment) : ''}; break;
+        case 'rating': r = {score: 3 + Math.floor(rnd() * 3), text: rnd() < .5 ? pick(coment) : ''}; break;
+      }
+      rows.push({pessoa, atividade: a.id, resposta: r});
+    });
+  }
+  return rows;
+}
+
+start();
+</script>
+</body>
+</html>
